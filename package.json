@@ -1,0 +1,8 @@
+{
+  "name": "emealia",
+  "private": true,
+  "workspaces": [
+    "client",
+    "shared"
+  ]
+}
