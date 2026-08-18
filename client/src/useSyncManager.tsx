@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { syncEngine } from './dataUtils/syncEngine.ts';
+import { syncEngine } from './utils/data/syncEngine.ts';
 
 export function useSyncManager() {
     useEffect(() => {

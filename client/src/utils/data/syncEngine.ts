@@ -1,6 +1,6 @@
-import { toCamelCase, toLowerSnakeCase } from "./caseUtils";
-import { db, EmealiaDB } from './db';
-import { supabase } from './supabase';
+import { toCamelCase, toLowerSnakeCase } from "./caseUtils.ts";
+import { db, EmealiaDB } from './db.ts';
+import { supabase } from './supabase.ts';
 import type { BaseSyncEntity } from '@emealia/shared';
 import Dexie, { type UpdateSpec } from 'dexie';
 

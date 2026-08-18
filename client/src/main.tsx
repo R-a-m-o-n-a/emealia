@@ -2,9 +2,19 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index-dummy.css'
 import App from './App.tsx'
+import { ensureAuthentication } from "./utils/user/getUserId.tsx";
+import { syncEngine } from "./utils/data/syncEngine.ts";
 
-createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-        <App />
-    </StrictMode>,
-)
+try {
+    await ensureAuthentication();
+    syncEngine.runSync().catch(error => console.error('[Initial Sync Failed]', error));
+
+    createRoot(document.getElementById('root')!).render(
+        <StrictMode>
+            <App />
+        </StrictMode>,
+    )
+} catch (error) {
+    console.error('[Error on Application Start] Failed to initialize session:', error);
+    // todo Show message "For the very first access to the application, you need an Internet connection"
+}

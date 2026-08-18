@@ -35,9 +35,9 @@ export interface Meal extends BaseSyncEntity {
     videoLink?: string;
     comment?: string; // Supports Markdown formatting
     categoryId?: string; // Foreign key to Category
-    isToTry: boolean;
-    isPrivate: boolean;
-    mainImageId: string;
+    isToTry?: boolean;
+    isPrivate?: boolean;
+    mainImageId?: string;
 }
 
 export interface Plan extends BaseSyncEntity {

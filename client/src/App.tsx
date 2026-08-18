@@ -1,29 +1,30 @@
-import { useState } from 'react'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import './App.css';
+import { TestHarness } from "./test/TestHarness";
+import { getUserId } from "./utils/user/getUserId";
 
 function App() {
-    const [count, setCount] = useState(0)
+    const [userId, setUserId] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-    return (
-        <>
-            <section id="center">
-                <div className="hero">
-                    <img src={viteLogo} className="vite" alt="Vite logo" />
-                </div>
-                <div>
-                    <h1>Get started</h1>
-                    <p>
-                        Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-                    </p>
-                </div>
-                <button type="button" className="counter" onClick={() => setCount((count) => count + 1)}>
-                    Count is {count}
-                </button>
-            </section>
+    useEffect(() => {
+        getUserId()
+            .then((id) => setUserId(id))
+            .catch((err) => {
+                console.error('Failed to resolve user session:', err);
+                setError(err.message || 'Authentication error');
+            });
+    }, []);
 
-        </>
-    )
+    if (error) {
+        return <div>Error initializing session: {error}</div>;
+    }
+
+    if (!userId) {
+        return <div>Loading session...</div>;
+    }
+
+    return <TestHarness userId={userId} />;
 }
 
-export default App
+export default App;
