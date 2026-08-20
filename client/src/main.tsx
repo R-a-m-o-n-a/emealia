@@ -1,10 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index-dummy.css'
-import App from './App.tsx'
 import { ensureAuthentication } from "./utils/user/getUserId.tsx";
 import { syncEngine } from "./utils/data/syncEngine.ts";
 import { registerSW } from 'virtual:pwa-register';
+import { router } from "./router.tsx";
+import { RouterProvider } from 'react-router-dom';
 
 try {
     if ('serviceWorker' in navigator) {
@@ -15,7 +16,7 @@ try {
 
     createRoot(document.getElementById('root')!).render(
         <StrictMode>
-            <App />
+            <RouterProvider router={router} />
         </StrictMode>,
     )
 } catch (error) {
