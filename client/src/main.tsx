@@ -4,8 +4,12 @@ import './index-dummy.css'
 import App from './App.tsx'
 import { ensureAuthentication } from "./utils/user/getUserId.tsx";
 import { syncEngine } from "./utils/data/syncEngine.ts";
+import { registerSW } from 'virtual:pwa-register';
 
 try {
+    if ('serviceWorker' in navigator) {
+        registerSW({immediate: true});
+    }
     await ensureAuthentication();
     syncEngine.runSync().catch(error => console.error('[Initial Sync Failed]', error));
 

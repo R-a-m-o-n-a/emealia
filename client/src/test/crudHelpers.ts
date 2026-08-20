@@ -1,3 +1,5 @@
+// AI written
+
 import type { Meal } from "@emealia/shared";
 import { db } from "../utils/data/db.ts";
 
