@@ -15,24 +15,20 @@ export default defineConfig({
                 short_name: 'Emealia',
                 description: 'Recipe Collection & Meal Planning',
                 theme_color: '#28793c',
-                background_color: '#ffffff',
+                background_color: '#28793c',
                 display: 'standalone',
                 icons: [
                     {
-                        src: 'pwa-192x192.png',
+                        src: '/assets/web-app-manifest-192x192.png',
                         sizes: '192x192',
-                        type: 'image/png'
+                        type: 'image/png',
+                        purpose: 'maskable'
                     },
                     {
-                        src: 'pwa-512x512.png',
-                        sizes: '512x512',
-                        type: 'image/png'
-                    },
-                    {
-                        src: 'pwa-512x512.png',
+                        src: '/assets/web-app-manifest-512x512.png',
                         sizes: '512x512',
                         type: 'image/png',
-                        purpose: 'any maskable' // Ensures full bleeding on modern Android launcher shapes
+                        purpose: 'maskable'
                     }
                 ],
             },
