@@ -42,7 +42,7 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@emealia/shared': path.resolve(__dirname, '../shared/index.ts'),
+            '@emealia/shared': path.resolve(import.meta.dirname, '../shared/index.ts'),
         },
     },
 })

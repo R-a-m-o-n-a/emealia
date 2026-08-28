@@ -4,6 +4,7 @@ import { RootLayout } from './components/RootLayout';
 // Placeholder view components
 const MealsPage = () => <div>Meal List View</div>;
 const MealDetailPage = () => <div>Meal Detail View</div>;
+const AddMealPage = () => <div>Add Meal</div>;
 const PlansPage = () => <div>Plans View</div>;
 
 export const router = createBrowserRouter([
@@ -14,6 +15,10 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <MealsPage />,
+            },
+            {
+                path: 'meals/add',
+                element: <AddMealPage />,
             },
             {
                 path: 'meals/:id',

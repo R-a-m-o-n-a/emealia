@@ -6,6 +6,7 @@ import { syncEngine } from "./utils/data/syncEngine.ts";
 import { registerSW } from 'virtual:pwa-register';
 import { router } from "./router.tsx";
 import { RouterProvider } from 'react-router-dom';
+import { MantineProvider } from '@mantine/core';
 
 try {
     if ('serviceWorker' in navigator) {
@@ -16,7 +17,9 @@ try {
 
     createRoot(document.getElementById('root')!).render(
         <StrictMode>
-            <RouterProvider router={router} />
+            <MantineProvider>
+                <RouterProvider router={router} />
+            </MantineProvider>
         </StrictMode>,
     )
 } catch (error) {
