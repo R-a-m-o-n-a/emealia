@@ -1,5 +1,6 @@
 .LabelWithIcon {
-    display: inline-flex;
+    display: flex;
+    padding: 3px 0;
     align-items: center;
     justify-content: center;
     contain: layout;
