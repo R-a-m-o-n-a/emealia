@@ -1,14 +1,10 @@
-import {useShowAppMenu} from './useShowAppMenu.ts';
-import {MenuButton} from '../Buttons/MenuButton.tsx';
-import {BackButton} from '../Buttons/BackButton.tsx';
+import type {ReactNode} from "react";
 import './Navbar.css';
 
-export function Navbar() {
-    const showAppMenu = useShowAppMenu();
-
+export function Navbar({children}: { children: ReactNode }) {
     return (
         <div className="Navbar">
-            {showAppMenu ? <MenuButton/> : <BackButton/>}
+            {children}
         </div>
     );
 }

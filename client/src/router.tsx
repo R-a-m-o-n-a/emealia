@@ -1,13 +1,11 @@
 import {createBrowserRouter, Navigate} from 'react-router';
-import {RootLayout} from './components/Layout/RootLayout.tsx';
-import {MealDetailPage} from "./components/Meals/MealDetailPage.tsx";
 import {FloatingNavLayout} from "./components/Layout/FloatingNavLayout.tsx";
+import {RootLayout} from './components/Layout/RootLayout.tsx';
+import {AddMealPage} from "./components/Meals/AddMeal/AddMealPage.tsx";
+import {MealDetailPage} from "./components/Meals/MealDetail/MealDetailPage.tsx";
+import {MealsPage} from "./components/Meals/MealsPage.tsx";
+import {PlansPage} from "./components/Plans/PlansPage.tsx";
 import type {AppRouteHandle} from './navigation/routeHandles.ts';
-
-// Placeholder view components
-const MealsPage = () => <div>Meal List View</div>;
-const AddMealPage = () => <div>Add Meal</div>;
-const PlansPage = () => <div>Plans View</div>;
 
 export const router = createBrowserRouter([
     {

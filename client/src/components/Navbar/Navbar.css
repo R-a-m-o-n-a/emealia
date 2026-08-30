@@ -1,4 +1,6 @@
 .Navbar {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: calc(env(safe-area-inset-top) + 16px) calc(env(safe-area-inset-right) + 16px) 16px calc(env(safe-area-inset-left) + 16px);
 }

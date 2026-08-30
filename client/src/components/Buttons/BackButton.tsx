@@ -1,6 +1,6 @@
 import {ActionIcon} from '@mantine/core';
+import {TbChevronLeft} from 'react-icons/tb';
 import {useNavigate} from 'react-router';
-import {TbArrowLeft} from 'react-icons/tb';
 
 export function BackButton() {
     const navigate = useNavigate();
@@ -11,8 +11,9 @@ export function BackButton() {
         <ActionIcon
             aria-label="Go back"
             onClick={handleBack}
+            style={{paddingRight: '1px'}}
         >
-            <TbArrowLeft size={20}/>
+            <TbChevronLeft size={20}/>
         </ActionIcon>
     );
 }
