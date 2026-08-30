@@ -1,0 +1,10 @@
+.FloatingNav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    width: 100%;
+    padding: 0 calc(24px + env(safe-area-inset-right)) 0 calc(16px + env(safe-area-inset-left));
+}

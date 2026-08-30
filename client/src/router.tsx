@@ -2,6 +2,7 @@ import {createBrowserRouter, Navigate} from 'react-router';
 import {RootLayout} from './components/Layout/RootLayout.tsx';
 import {MealDetailPage} from "./components/Meals/MealDetailPage.tsx";
 import {FloatingNavLayout} from "./components/Layout/FloatingNavLayout.tsx";
+import type {AppRouteHandle} from './navigation/routeHandles.ts';
 
 // Placeholder view components
 const MealsPage = () => <div>Meal List View</div>;
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
             },
             {
                 Component: FloatingNavLayout,
+                handle: {showAppMenu: true} satisfies AppRouteHandle,
                 children: [
                     {
                         path: 'meals',
