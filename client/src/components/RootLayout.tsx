@@ -1,4 +1,5 @@
-import { NavLink, type NavLinkRenderProps, Outlet, ScrollRestoration } from 'react-router-dom';
+import { Outlet, ScrollRestoration } from 'react-router';
+import { FloatingTabs } from "./FloatingTabs.tsx";
 
 export function RootLayout() {
     return (
@@ -9,18 +10,7 @@ export function RootLayout() {
             </main>
 
             {/* Persistent Bottom Navigation Shell */}
-            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 flex items-center justify-around z-40">
-                <NavLink to="/" className={({isActive}: NavLinkRenderProps) =>
-                    `text-xs font-medium ${isActive ? 'text-green-600' : 'text-slate-500'}`
-                }>
-                    Meals
-                </NavLink>
-                <NavLink to="/plans" className={({isActive}: NavLinkRenderProps) =>
-                    `text-xs font-medium ${isActive ? 'text-green-600' : 'text-slate-500'}`
-                }>
-                    Plans
-                </NavLink>
-            </nav>
+            <FloatingTabs />
 
             <ScrollRestoration />
         </div>

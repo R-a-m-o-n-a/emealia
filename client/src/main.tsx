@@ -5,7 +5,8 @@ import { ensureAuthentication } from "./utils/user/getUserId.tsx";
 import { syncEngine } from "./utils/data/syncEngine.ts";
 import { registerSW } from 'virtual:pwa-register';
 import { router } from "./router.tsx";
-import { RouterProvider } from 'react-router-dom';
+import '@mantine/core/styles.css';
+import { RouterProvider } from "react-router/dom";
 import { MantineProvider } from '@mantine/core';
 
 try {
