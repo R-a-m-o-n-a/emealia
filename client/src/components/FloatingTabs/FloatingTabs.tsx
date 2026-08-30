@@ -1,6 +1,5 @@
 import {useMemo, useState} from 'react';
 import type {IconType} from "react-icons";
-
 import {SegmentedControl} from '@mantine/core';
 import {useLocation, useNavigate} from 'react-router';
 import {
@@ -43,33 +42,40 @@ export function FloatingTabs() {
         if (pathToOpen === 'meals') {
             setCurrentMealIcon((prev: IconType) => getRandomMealIcon(prev));
         }
-
         navigate(`/${pathToOpen}`);
     };
 
     const options = useMemo(() => {
-        const navItems = [
-            {value: 'meals', labelText: 'Meals', Icon: currentMealIcon},
-            {value: 'plans', labelText: 'Plans', Icon: TbClipboardListFilled},
+        return [
+            {
+                value: 'meals',
+                label: (
+                    <LabelWithIcon
+                        label="Meals"
+                        Icon={currentMealIcon}
+                        value="meals"
+                    />
+                ),
+            },
+            {
+                value: 'plans',
+                label: (
+                    <LabelWithIcon
+                        label="Plans"
+                        Icon={TbClipboardListFilled}
+                        value="plans"
+                    />
+                ),
+            },
         ];
-
-        return navItems.map((item) => ({
-            value: item.value,
-            label: (
-                <LabelWithIcon
-                    label={item.labelText}
-                    Icon={item.Icon}
-                    value={item.value}
-                />
-            ),
-        }));
     }, [currentMealIcon]);
 
     return (
         <SegmentedControl
             value={activeValue}
             onChange={handleTabChange}
-            transitionDuration={450}
+            transitionDuration={150}
+            transitionTimingFunction="cubic-bezier(0.4, 0, 0.2, 1)"
             withItemsBorders={false}
             size="md"
             radius="xl"
