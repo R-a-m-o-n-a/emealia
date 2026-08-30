@@ -1,6 +1,7 @@
-import { createBrowserRouter, Navigate } from 'react-router';
-import { RootLayout } from './components/RootLayout';
-import { MealDetailPage } from "./components/Meals/MealDetailPage.tsx";
+import {createBrowserRouter, Navigate} from 'react-router';
+import {RootLayout} from './components/Layout/RootLayout.tsx';
+import {MealDetailPage} from "./components/Meals/MealDetailPage.tsx";
+import {FloatingNavLayout} from "./components/Layout/FloatingNavLayout.tsx";
 
 // Placeholder view components
 const MealsPage = () => <div>Meal List View</div>;
@@ -14,33 +15,33 @@ export const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Navigate to="/meals" replace />,
+                element: <Navigate to="/meals" replace/>,
             },
             {
-                path: 'meals',
+                Component: FloatingNavLayout,
                 children: [
                     {
-                        index: true,
+                        path: 'meals',
                         Component: MealsPage,
                     },
                     {
-                        path: 'add',
-                        Component: AddMealPage,
+                        path: 'plans',
+                        Component: PlansPage,
                     },
-                    {
-                        path: ':id',
-                        Component: MealDetailPage,
-                        loader: /*async*/ ({params}) => {
-                            // params are available in loaders/actions
-                            // let team = await fetchTeam(params.teamId);
-                            return {mealId: params.id};
-                        },
-                    },
-                ]
+                ],
             },
             {
-                path: 'plans',
-                Component: PlansPage,
+                path: 'meals/add',
+                Component: AddMealPage,
+            },
+            {
+                path: 'meals/:id',
+                Component: MealDetailPage,
+                loader: /*async*/ ({params}) => {
+                    // params are available in loaders/actions
+                    // let team = await fetchTeam(params.teamId);
+                    return {mealId: params.id};
+                },
             },
         ],
     },
