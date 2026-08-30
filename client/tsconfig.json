@@ -12,6 +12,7 @@
     }
   ],
   "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
     "types": [
       "vite/client",
       "vite-plugin-pwa/client"
