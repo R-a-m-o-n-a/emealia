@@ -1,5 +1,5 @@
 import { Outlet, ScrollRestoration } from 'react-router';
-import { FloatingTabs } from "./FloatingTabs.tsx";
+import { FloatingTabs } from "./FloatingTabs/FloatingTabs.tsx";
 
 export function RootLayout() {
     return (

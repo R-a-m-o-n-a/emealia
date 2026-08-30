@@ -1,0 +1,46 @@
+.LabelWithIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* ============================================================= */
+/* Icon Base State (Inactive for all tabs)                       */
+/* ============================================================= */
+.LabelWithIcon-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 0;
+    opacity: 0;
+    transform: scale(0);
+
+    /* Immediate shrink when unselected */
+    transition: max-width 0.15s cubic-bezier(0.4, 0, 1, 1) 0s,
+    opacity 0.1s linear 0s,
+    transform 0.15s cubic-bezier(0.4, 0, 1, 1) 0s;
+}
+
+/* ============================================================= */
+/* Active State: Default / Plans (FAST & Smooth - NO POP)        */
+/* ============================================================= */
+[data-active="true"] .LabelWithIcon-icon {
+    max-width: 20px;
+    opacity: 1;
+    transform: scale(1);
+
+    /* Fast 0.1s / 0.12s expansion right as the pill arrives */
+    transition: max-width 0.12s ease-out 0.12s,
+    opacity 0.08s linear 0.12s,
+    transform 0.1s ease-out 0.12s;
+}
+
+/* ============================================================= */
+/* Active State: Meals Tab ONLY (Keeps the playful Bouncy Pop)   */
+/* ============================================================= */
+[data-active="true"] .LabelWithIcon[data-item-value="meals"] .LabelWithIcon-icon {
+    transition: max-width 0.2s cubic-bezier(0, 0, 0.2, 1) 0.15s,
+    opacity 0.15s linear 0.15s,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s;
+}
