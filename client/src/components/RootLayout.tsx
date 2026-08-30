@@ -1,14 +1,24 @@
-import {Outlet, ScrollRestoration} from 'react-router';
+import {Outlet, ScrollRestoration, useLocation} from 'react-router';
 import {FloatingTabs} from "./FloatingTabs/FloatingTabs.tsx";
 
 export function RootLayout() {
+    const location = useLocation();
+    console.log(location.pathname);
+
+    const isFloatingNavVisible = location.pathname === '/plans' || location.pathname === '/meals';
+
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-            <main className="flex-1 pb-16">
+        <div className="">
+            
+            <main className="">
                 <Outlet/>
             </main>
 
-            <FloatingTabs/>
+            {isFloatingNavVisible && (
+                <nav>
+                    <FloatingTabs/>
+                </nav>
+            )}
 
             <ScrollRestoration/>
         </div>
