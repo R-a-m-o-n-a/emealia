@@ -1,0 +1,31 @@
+.form {
+    width: min(100%, 420px);
+}
+
+.floatingField {
+    position: relative;
+}
+
+.floatingLabel {
+    position: absolute;
+    z-index: 1;
+    top: -0.55rem;
+    left: 0.7rem;
+    padding: 0 0.25rem;
+    background: var(--mantine-color-body);
+    color: var(--mantine-color-teal-6);
+    font-size: var(--mantine-font-size-xs);
+    font-weight: 500;
+}
+
+.input,
+.textarea,
+.pillsInput {
+    border-color: var(--mantine-color-gray-4);
+}
+
+.input:focus,
+.textarea:focus,
+.pillsInput:focus-within {
+    border-color: var(--mantine-color-teal-6);
+}

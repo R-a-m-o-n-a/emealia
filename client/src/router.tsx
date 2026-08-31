@@ -1,4 +1,5 @@
 import {createBrowserRouter, Navigate} from 'react-router';
+import {RootErrorBoundary} from "./components/Errors/RootErrorBoundary.tsx";
 import {FloatingNavLayout} from "./components/Layout/FloatingNavLayout.tsx";
 import {RootLayout} from './components/Layout/RootLayout.tsx';
 import {AddMealPage} from "./components/Meals/AddMeal/AddMealPage.tsx";
@@ -11,6 +12,7 @@ export const router = createBrowserRouter([
     {
         path: '/',
         Component: RootLayout,
+        ErrorBoundary: RootErrorBoundary,
         children: [
             {
                 index: true,

@@ -2,6 +2,7 @@ import "./AddMealPage.css";
 import {BackButton} from "../../Buttons/BackButton.tsx";
 import {DoneButton} from "../../Buttons/DoneButton.tsx";
 import {Navbar} from "../../Navbar/Navbar.tsx";
+import {EditMealForm} from "./EditMealForm.tsx";
 
 export function AddMealPage({}) {
     return (
@@ -11,7 +12,8 @@ export function AddMealPage({}) {
                 New Meal
                 <DoneButton/>
             </Navbar>
-            Add Meal
+
+            <EditMealForm/>
         </div>
     );
 }
