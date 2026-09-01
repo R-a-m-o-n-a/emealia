@@ -1,9 +1,9 @@
 // AI written
 
-import React, { useEffect, useState } from 'react';
-import { createTestMeal, softDeleteMeal, updateMealTitle, } from './crudHelpers';
-import { db } from "../utils/data/db.ts";
-import { syncEngine } from "../utils/data/syncEngine.ts"; // Import the helpers created earlier
+import React, {useEffect, useState} from 'react';
+import {db} from "../utils/data/db.ts";
+import {syncEngine} from "../utils/data/syncEngine.ts"; // Import the helpers created earlier
+import {createTestMeal, softDeleteMeal, updateMealTitle,} from './crudHelpers';
 
 interface TestLog {
     id: string;
@@ -33,7 +33,7 @@ export const TestHarness: React.FC<{ userId: string }> = ({userId}) => {
     // Refresh local Dexie stats live
     const refreshStats = async () => {
         const all = await db.meals.toArray();
-        const dirty = all.filter((m) => m.syncStatus === 'dirty').length;
+        const dirty = all.filter((m) => m.syncStatus === 'pending').length;
         const synced = all.filter((m) => m.syncStatus === 'synced').length;
         setDbStats({total: all.length, dirty, synced});
     };
@@ -160,7 +160,8 @@ export const TestHarness: React.FC<{ userId: string }> = ({userId}) => {
                     + Create Test Meal
                 </button>
 
-                <button onClick={handleManualSync} disabled={isSyncing || !isOnline} style={isSyncing || !isOnline ? styles.btnDisabled : styles.btnSuccess}>
+                <button onClick={handleManualSync} disabled={isSyncing || !isOnline}
+                        style={isSyncing || !isOnline ? styles.btnDisabled : styles.btnSuccess}>
                     {isSyncing ? 'Syncing...' : '🔄 Run Sync Engine'}
                 </button>
 
@@ -195,18 +196,69 @@ export const TestHarness: React.FC<{ userId: string }> = ({userId}) => {
 // --- Embedded Inline Styles for Quick Setup ---
 const styles: Record<string, React.CSSProperties> = {
     container: {padding: '24px', fontFamily: 'sans-serif', maxWidth: '800px', margin: '0 auto'},
-    statusBar: {display: 'flex', justifyContent: 'space-between', background: '#f5f5f5', padding: '12px', borderRadius: '6px', marginBottom: '16px'},
+    statusBar: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        background: '#f5f5f5',
+        padding: '12px',
+        borderRadius: '6px',
+        marginBottom: '16px'
+    },
     code: {background: '#e0e0e0', padding: '2px 6px', borderRadius: '4px', fontSize: '12px'},
     cardContainer: {display: 'flex', gap: '16px', marginBottom: '20px'},
     card: {flex: 1, border: '2px solid #1976d2', borderRadius: '8px', padding: '12px', textAlign: 'center'},
     cardValue: {fontSize: '28px', fontWeight: 'bold', color: '#1976d2'},
     cardLabel: {fontSize: '12px', color: '#666', marginTop: '4px'},
     buttonRow: {display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '24px'},
-    btnPrimary: {padding: '10px 16px', backgroundColor: '#1976d2', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer'},
-    btnSuccess: {padding: '10px 16px', backgroundColor: '#2e7d32', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer'},
-    btnPipeline: {padding: '10px 16px', backgroundColor: '#9c27b0', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer'},
-    btnDanger: {padding: '10px 16px', backgroundColor: '#d32f2f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer'},
-    btnDisabled: {padding: '10px 16px', backgroundColor: '#ccc', color: '#666', border: 'none', borderRadius: '4px', cursor: 'not-allowed'},
-    console: {background: '#1e1e1e', color: '#fff', padding: '16px', borderRadius: '6px', height: '220px', overflowY: 'auto', fontFamily: 'monospace', fontSize: '13px'},
+    btnPrimary: {
+        padding: '10px 16px',
+        backgroundColor: '#1976d2',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer'
+    },
+    btnSuccess: {
+        padding: '10px 16px',
+        backgroundColor: '#2e7d32',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer'
+    },
+    btnPipeline: {
+        padding: '10px 16px',
+        backgroundColor: '#9c27b0',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer'
+    },
+    btnDanger: {
+        padding: '10px 16px',
+        backgroundColor: '#d32f2f',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer'
+    },
+    btnDisabled: {
+        padding: '10px 16px',
+        backgroundColor: '#ccc',
+        color: '#666',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'not-allowed'
+    },
+    console: {
+        background: '#1e1e1e',
+        color: '#fff',
+        padding: '16px',
+        borderRadius: '6px',
+        height: '220px',
+        overflowY: 'auto',
+        fontFamily: 'monospace',
+        fontSize: '13px'
+    },
     logLine: {marginBottom: '6px'},
 };

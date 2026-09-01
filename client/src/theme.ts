@@ -6,7 +6,7 @@ export const theme = createTheme({
         'emealia-green': ['#f0faf2', '#e0f2e4', '#bbe4c5', '#93d7a3', '#73cb87', '#5ec474', '#53c16b', '#43a95a', '#39974e', '#28793c'],
     },
     primaryColor: 'emealia-green',
-    primaryShade: {light: 9, dark: 8},
+    primaryShade: {light: 9, dark: 9},
     components: {
         ActionIcon: ActionIcon.extend({
             defaultProps: {

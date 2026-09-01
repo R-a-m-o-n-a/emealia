@@ -1,8 +1,8 @@
-import { toCamelCase, toLowerSnakeCase } from "./caseUtils.ts";
-import { db, EmealiaDB } from './db.ts';
-import { supabase } from './supabase.ts';
-import type { BaseSyncEntity } from '@emealia/shared';
-import Dexie, { type UpdateSpec } from 'dexie';
+import type {BaseSyncEntity} from '@emealia/shared';
+import Dexie, {type UpdateSpec} from 'dexie';
+import {toCamelCase, toLowerSnakeCase} from "./caseUtils.ts";
+import {db, EmealiaDB} from './db.ts';
+import {supabase} from './supabase.ts';
 
 const LAST_SYNC_KEY = 'emealia_last_synced_at';
 
@@ -51,7 +51,7 @@ export class SyncEngine {
     ): Promise<void> {
         const table = db[localTable] as unknown as Dexie.Table<T, string>;
 
-        const dirtyRecords = await table.where('syncStatus').equals('dirty').toArray();
+        const dirtyRecords = await table.where('syncStatus').equals('pending').toArray();
         if (dirtyRecords.length === 0) return;
 
         const dirtyRecordIds = dirtyRecords.map((r) => r.id);
@@ -113,7 +113,7 @@ export class SyncEngine {
                 const recordInCamelCase = toCamelCase<T>(rawRecord);
                 const localRecord = await table.get(recordInCamelCase.id);
 
-                if (localRecord && (localRecord.syncStatus === 'dirty' || localRecord.syncStatus === 'syncing')) {
+                if (localRecord && (localRecord.syncStatus === 'pending' || localRecord.syncStatus === 'syncing')) {
                     continue; // Local un-pushed changes take precedence
                 }
 

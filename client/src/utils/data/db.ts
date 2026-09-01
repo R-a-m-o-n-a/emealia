@@ -1,6 +1,15 @@
-import type { Table } from 'dexie';
+import type {
+    Category,
+    Meal,
+    MealImage,
+    MealTagRelation,
+    MissingIngredient,
+    Plan,
+    Tag,
+    UserSettings
+} from '@emealia/shared';
+import type {Table} from 'dexie';
 import Dexie from 'dexie';
-import type { Category, Meal, MealImage, MealTagRelation, MissingIngredient, Plan, Tag, UserSettings } from '@emealia/shared';
 
 export class EmealiaDB extends Dexie {
     categories!: Table<Category>;

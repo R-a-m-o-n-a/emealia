@@ -3,7 +3,7 @@ export interface BaseSyncEntity {
     userId: string; // foreign key to auth.users
     createdAt: string; // ISO 8601 string
     updatedAt: string; // Required for conflict resolution
-    syncStatus: 'synced' | 'dirty' | 'syncing' | 'error';
+    syncStatus: 'synced' | 'pending' | 'syncing' | 'error';
     isDeleted: boolean;
 }
 
@@ -33,7 +33,7 @@ export interface Meal extends BaseSyncEntity {
     title: string;
     recipeLink?: string;
     videoLink?: string;
-    comment?: string; // Supports Markdown formatting
+    freeText?: string; // Supports Markdown formatting
     categoryId?: string; // Foreign key to Category
     isToTry?: boolean;
     isPrivate?: boolean;

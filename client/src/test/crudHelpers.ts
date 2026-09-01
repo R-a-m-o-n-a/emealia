@@ -1,7 +1,7 @@
 // AI written
 
-import type { Meal } from "@emealia/shared";
-import { db } from "../utils/data/db.ts";
+import type {Meal} from "@emealia/shared";
+import {db} from "../utils/data/db.ts";
 
 // CREATE
 
@@ -10,7 +10,7 @@ export async function createTestMeal(userId: string, title: string): Promise<Mea
         id: crypto.randomUUID(),
         userId,
         title,
-        syncStatus: 'dirty',
+        syncStatus: 'pending',
         isDeleted: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -31,7 +31,7 @@ export async function getActiveMeals(): Promise<Meal[]> {
 export async function updateMealTitle(id: string, newTitle: string): Promise<void> {
     await db.meals.update(id, {
         title: newTitle,
-        syncStatus: 'dirty',
+        syncStatus: 'pending',
         updatedAt: new Date().toISOString(),
     });
 }
@@ -40,7 +40,7 @@ export async function updateMealTitle(id: string, newTitle: string): Promise<voi
 export async function softDeleteMeal(id: string): Promise<void> {
     await db.meals.update(id, {
         isDeleted: true,
-        syncStatus: 'dirty',
+        syncStatus: 'pending',
         updatedAt: new Date().toISOString(),
     });
 }

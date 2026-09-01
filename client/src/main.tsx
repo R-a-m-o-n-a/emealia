@@ -1,14 +1,15 @@
+import {MantineProvider} from '@mantine/core';
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
 import './index-dummy.css'
-import {ensureAuthentication} from "./utils/user/getUserId.tsx";
-import {syncEngine} from "./utils/data/syncEngine.ts";
+import {RouterProvider} from "react-router/dom";
 import {registerSW} from 'virtual:pwa-register';
+import {AuthProvider} from "./contexts/AuthContext.tsx";
 import {router} from "./router.tsx";
 import '@mantine/core/styles.css';
-import {RouterProvider} from "react-router/dom";
-import {MantineProvider} from '@mantine/core';
 import {theme} from './theme.ts';
+import {syncEngine} from "./utils/data/syncEngine.ts";
+import {ensureAuthentication} from "./utils/user/getUserId.tsx";
 
 try {
     if ('serviceWorker' in navigator) {
@@ -19,9 +20,11 @@ try {
 
     createRoot(document.getElementById('root')!).render(
         <StrictMode>
-            <MantineProvider theme={theme} defaultColorScheme={"auto"}>
-                <RouterProvider router={router}/>
-            </MantineProvider>
+            <AuthProvider>
+                <MantineProvider theme={theme} defaultColorScheme={"auto"}>
+                    <RouterProvider router={router}/>
+                </MantineProvider>
+            </AuthProvider>
         </StrictMode>,
     )
 } catch (error) {
