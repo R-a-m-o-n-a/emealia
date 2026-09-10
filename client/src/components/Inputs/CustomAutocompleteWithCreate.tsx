@@ -1,6 +1,6 @@
-import {Autocomplete, Button, type ComboboxItem, Group, Modal, type OptionsFilter, Text,} from "@mantine/core";
+import {Autocomplete, Button, type ComboboxItem, Group, Modal, Text} from "@mantine/core";
 import Fuse from "fuse.js";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import {TbPlus} from "react-icons/tb";
 import {t} from "../../utils/translate.ts";
 
@@ -9,29 +9,39 @@ const CREATE_PREFIX = "$create:";
 interface CustomAutocompleteWithCreateProps {
     options: string[];
     value?: string;
+    defaultValue?: string;
     onChange?: (val: string) => void;
     onCreateCategory: (categoryName: string) => Promise<unknown>;
     placeholder?: string;
-    key?: string;
+    onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
+    onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 export function CustomAutocompleteWithCreate({
                                                  options,
-                                                 value = "",
+                                                 value,
+                                                 defaultValue,
                                                  onChange,
                                                  onCreateCategory,
                                                  placeholder,
+                                                 ...remainingProps
                                              }: CustomAutocompleteWithCreateProps) {
     const [modalOpened, setModalOpened] = useState(false);
     const [pendingCategory, setPendingCategory] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [searchValue, setSearchValue] = useState("");
 
-    const categoryOptionsFilter: OptionsFilter = ({options: rawOptions, search}) => {
-        const query = search.trim();
-        if (!query) return rawOptions;
+    // Dynamically compute options so Mantine's `data` includes the dynamic create option, otherwise there will be an error since it cannot access the label of the "add Category" option
+    const computedData = useMemo<ComboboxItem[]>(() => {
+        const query = searchValue.trim();
+        const baseOptions: ComboboxItem[] = options.map((opt) => ({
+            value: opt,
+            label: opt,
+        }));
 
-        const comboboxOpts = rawOptions as ComboboxItem[];
-        const fuse = new Fuse(comboboxOpts, {
+        if (!query) return baseOptions;
+
+        const fuse = new Fuse(baseOptions, {
             keys: ["label"],
             threshold: 0.3,
             minMatchCharLength: 1,
@@ -51,7 +61,7 @@ export function CustomAutocompleteWithCreate({
         }
 
         return results;
-    };
+    }, [options, searchValue]);
 
     const handleOptionSubmit = (val: string) => {
         if (val.startsWith(CREATE_PREFIX)) {
@@ -79,23 +89,35 @@ export function CustomAutocompleteWithCreate({
         <>
             <Autocomplete
                 placeholder={placeholder}
-                data={options}
+                data={computedData}
                 value={value}
-                onChange={onChange}
-                filter={categoryOptionsFilter}
+                defaultValue={defaultValue}
+                selectFirstOptionOnChange
+                // Maintain search string state to feed computedData
                 onOptionSubmit={handleOptionSubmit}
+                onChange={(val) => {
+                    setSearchValue(val);
+                    // Avoid pushing dirty CREATE_PREFIX text into Form state directly
+                    if (!val.startsWith(CREATE_PREFIX)) {
+                        onChange?.(val);
+                    }
+                }}
+                // Disable internal component filtering as computedData handles it
+                filter={({options: opts}) => opts}
                 renderOption={({option}) => {
                     const isCreate = option.value.startsWith(CREATE_PREFIX);
                     if (isCreate) {
+                        const cleanLabel = option.value.replace(CREATE_PREFIX, "");
                         return (
                             <Group gap="xs">
                                 <TbPlus size={16}/>
-                                <Text size="sm">{t(`Add "${option.value}"`)}</Text>
+                                <Text size="sm">{t(`Add "${cleanLabel}"`)}</Text>
                             </Group>
                         );
                     }
                     return option.value;
                 }}
+                {...remainingProps}
             />
 
             <Modal
