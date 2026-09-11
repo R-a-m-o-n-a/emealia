@@ -1,9 +1,17 @@
-import {v4 as uuidv4} from 'uuid';
 import {db} from '../db';
 
 export async function addCategoryIfNew(userId: string, categoryName: string): Promise<string> {
     const trimmed = categoryName.trim();
-    if (!trimmed) return '';
+
+    if (!trimmed) {
+        console.error("Trying to create empty category");
+        return '';
+    }
+
+    if (!userId) {
+        console.error("Trying to create category for unknown userId");
+        return '';
+    }
 
     const existing = await db.categories
         .where('userId')
@@ -17,7 +25,7 @@ export async function addCategoryIfNew(userId: string, categoryName: string): Pr
 
     const now = new Date().toISOString();
     const newCategory = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         userId,
         name: trimmed,
         createdAt: now,

@@ -1,17 +1,24 @@
 import type {Meal} from "@emealia/shared";
-import {Switch, Textarea, TextInput} from "@mantine/core";
+import {Button, Group, Switch, Textarea, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import "./EditMealForm.css";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import {useTagsAndCategories} from "../../../hooks/useTagsAndCategories.tsx";
 import {addCategoryIfNew} from "../../../utils/data/helpers/addCategoryIfNew.ts";
+import {addMeal} from "../../../utils/data/helpers/addMeal.ts";
 import {addTagIfNew} from "../../../utils/data/helpers/addTagIfNew.ts";
 import {t} from "../../../utils/translate.ts";
 import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithCreate.tsx";
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
 
-export function EditMealForm({existingMeal}: { existingMeal?: Meal }) {
+interface EditMealFormProps {
+    existingMeal?: Meal;
+    onSuccess?: () => void;
+}
+
+// todo use mealId as key when calling the component to reset state if meal changes
+export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
     const {userId} = useAuth();
     const tagsAndCategories = useTagsAndCategories(userId);
 
@@ -19,6 +26,9 @@ export function EditMealForm({existingMeal}: { existingMeal?: Meal }) {
     const tags = tagsAndCategories?.tags ?? [];
     const categoryNames = categories.map((category) => category.name);
     const tagNames = tags.map((tag) => tag.name);
+
+    const [recipeLink, setRecipeLink] = useState<string>(existingMeal?.recipeLink ?? "");
+    const [videoLink, setVideoLink] = useState<string>(existingMeal?.videoLink ?? "");
 
     const form = useForm({
         mode: "uncontrolled",
@@ -29,6 +39,9 @@ export function EditMealForm({existingMeal}: { existingMeal?: Meal }) {
             isPrivate: false,
             isToTry: false,
             tags: [] as string[],
+        },
+        validate: {
+            title: (value) => (value.trim().length > 0 ? null : t("Your meal needs a title")),
         },
     });
 
@@ -47,17 +60,45 @@ export function EditMealForm({existingMeal}: { existingMeal?: Meal }) {
 
     const handleAddNewTag = async (newTag: string) => {
         const trimmed = newTag.trim();
-        if (!trimmed) return;
+        if (!trimmed || !userId) return;
 
         await addTagIfNew(userId, trimmed);
     };
 
     const handleCreateCategory = async (newCategory: string) => {
+        if (!userId) return "";
         return await addCategoryIfNew(userId, newCategory);
     };
 
+    const handleSubmit = async (values: typeof form.values) => {
+        if (!userId) return;
+
+        try {
+            await addMeal(userId, {
+                title: values.title,
+                category: values.category,
+                freeText: values.freeText,
+                isPrivate: values.isPrivate,
+                isToTry: values.isToTry,
+                tags: values.tags,
+                recipeLink,
+                videoLink,
+            });
+
+            form.reset();
+            setRecipeLink("");
+            setVideoLink("");
+
+            if (onSuccess) {
+                onSuccess();
+            }
+        } catch (error) {
+            console.error("Failed to add meal:", error);
+        }
+    };
+
     return (
-        <div className="EditMealForm">
+        <form onSubmit={form.onSubmit(handleSubmit)} className="EditMealForm">
             <TextInput
                 radius="sm"
                 placeholder={t("Title")}
@@ -75,10 +116,12 @@ export function EditMealForm({existingMeal}: { existingMeal?: Meal }) {
             />
 
             <Switch
+                label={t("Private")}
                 key={form.key("isPrivate")}
                 {...form.getInputProps("isPrivate", {type: "checkbox"})}
             />
             <Switch
+                label={t("To Try")}
                 key={form.key("isToTry")}
                 {...form.getInputProps("isToTry", {type: "checkbox"})}
             />
@@ -94,6 +137,10 @@ export function EditMealForm({existingMeal}: { existingMeal?: Meal }) {
                 key={form.key("tags")}
                 {...form.getInputProps("tags")}
             />
-        </div>
+
+            <Group justify="flex-end" mt="md">
+                <Button type="submit">{t("Save Meal")}</Button>
+            </Group>
+        </form>
     );
 }

@@ -1,9 +1,17 @@
-import {v4 as uuidv4} from 'uuid';
 import {db} from '../db';
 
 export async function addTagIfNew(userId: string, tagName: string): Promise<string> {
     const trimmedInput = tagName.trim();
-    if (!trimmedInput) return '';
+
+    if (!trimmedInput) {
+        console.error("Trying to create empty tag");
+        return '';
+    }
+
+    if (!userId) {
+        console.error("Trying to create tag for unknown userId");
+        return '';
+    }
 
     // 1. Check if tag exists (case-insensitive)
     const existingTag = await db.tags
@@ -19,7 +27,7 @@ export async function addTagIfNew(userId: string, tagName: string): Promise<stri
     // 2. Create new tag if missing
     const now = new Date().toISOString();
     const newTag = {
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         userId,
         name: trimmedInput,
         createdAt: now,

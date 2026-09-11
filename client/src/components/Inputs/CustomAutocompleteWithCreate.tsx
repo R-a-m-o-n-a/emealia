@@ -93,11 +93,9 @@ export function CustomAutocompleteWithCreate({
                 value={value}
                 defaultValue={defaultValue}
                 selectFirstOptionOnChange
-                // Maintain search string state to feed computedData
                 onOptionSubmit={handleOptionSubmit}
                 onChange={(val) => {
                     setSearchValue(val);
-                    // Avoid pushing dirty CREATE_PREFIX text into Form state directly
                     if (!val.startsWith(CREATE_PREFIX)) {
                         onChange?.(val);
                     }
