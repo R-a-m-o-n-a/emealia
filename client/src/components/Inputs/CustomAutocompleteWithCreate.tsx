@@ -1,4 +1,4 @@
-import {Autocomplete, Button, type ComboboxItem, Group, Modal, Text} from "@mantine/core";
+import {Autocomplete, Button, Group, Modal, Text} from "@mantine/core";
 import Fuse from "fuse.js";
 import {useMemo, useState} from "react";
 import {TbPlus} from "react-icons/tb";
@@ -7,9 +7,8 @@ import {t} from "../../utils/translate.ts";
 const CREATE_PREFIX = "$create:";
 
 interface CustomAutocompleteWithCreateProps {
-    options: { label: string, value: string }[];
+    options: string[];
     value?: string;
-    defaultValue?: string;
     onChange?: (val: string) => void;
     onCreate: (name: string) => Promise<string | null>;
     placeholder?: string;
@@ -17,10 +16,10 @@ interface CustomAutocompleteWithCreateProps {
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
+// todo use value as key?
 export function CustomAutocompleteWithCreate({
                                                  options,
-                                                 value,
-                                                 defaultValue,
+                                                 value = "",
                                                  onChange,
                                                  onCreate,
                                                  placeholder,
@@ -29,42 +28,53 @@ export function CustomAutocompleteWithCreate({
     const [modalOpened, setModalOpened] = useState(false);
     const [pendingCategory, setPendingCategory] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [searchValue, setSearchValue] = useState("");
 
-    // Dynamically compute options so Mantine's `data` includes the dynamic create option, otherwise there will be an error since it cannot access the label of the "add Category" option
-    const computedData = useMemo<ComboboxItem[]>(() => {
-        const query = searchValue.trim();
+    const [inputValue, setInputValue] = useState(value);
 
-        if (!query) return options;
-
-        const fuse = new Fuse(options, {
-            keys: ["label"],
+    const fuse = useMemo(() => {
+        return new Fuse(options, {
             threshold: 0.3,
             minMatchCharLength: 1,
         });
+    }, [options]);
+
+    const computedData = useMemo<string[]>(() => {
+        const query = inputValue.trim();
+        if (!query) return options;
 
         const results = fuse.search(query).map((res) => res.item);
 
         const exactMatch = options.some(
-            (option) => option.label.toLowerCase() === query.toLowerCase()
+            (option) => option.toLowerCase() === query.toLowerCase()
         );
 
         if (!exactMatch) {
-            results.push({
-                value: `${CREATE_PREFIX}${query}`,
-                label: query,
-            });
+            results.push(`${CREATE_PREFIX}${query}`);
         }
 
         return results;
-    }, [options, searchValue]);
+    }, [options, inputValue, fuse]);
+
+    const handleInputChange = (val: string) => {
+        const cleanValue = val.startsWith(CREATE_PREFIX)
+            ? val.replace(CREATE_PREFIX, "")
+            : val;
+
+        setInputValue(cleanValue);
+
+        if (!val.startsWith(CREATE_PREFIX)) {
+            onChange?.(cleanValue);
+        }
+    };
 
     const handleOptionSubmit = (val: string) => {
         if (val.startsWith(CREATE_PREFIX)) {
             const newCategoryName = val.replace(CREATE_PREFIX, "");
             setPendingCategory(newCategoryName);
+            setInputValue(newCategoryName);
             setModalOpened(true);
         } else {
+            setInputValue(val);
             onChange?.(val);
         }
     };
@@ -73,9 +83,12 @@ export function CustomAutocompleteWithCreate({
         if (!pendingCategory) return;
         setIsSubmitting(true);
         try {
-            await onCreate(pendingCategory);
-            onChange?.(pendingCategory);
-            setModalOpened(false);
+            const created = await onCreate(pendingCategory);
+            if (created !== null) {
+                setInputValue(pendingCategory);
+                onChange?.(pendingCategory);
+                setModalOpened(false);
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -86,23 +99,14 @@ export function CustomAutocompleteWithCreate({
             <Autocomplete
                 placeholder={placeholder}
                 data={computedData}
-                value={value}
-                defaultValue={defaultValue}
+                value={inputValue}
                 selectFirstOptionOnChange
                 onOptionSubmit={handleOptionSubmit}
-                onChange={(val) => {
-                    setSearchValue(val);
-                    if (!val.startsWith(CREATE_PREFIX)) {
-                        onChange?.(val);
-                    }
-                }}
-                // Disable internal component filtering as computedData handles it
-                filter={({options: opts}) => opts}
+                onChange={handleInputChange}
                 renderOption={({option}) => {
-                    const item = option as ComboboxItem;
-                    const isCreate = item.label.startsWith(CREATE_PREFIX);
+                    const isCreate = option.value.startsWith(CREATE_PREFIX);
                     if (isCreate) {
-                        const cleanLabel = item.label.replace(CREATE_PREFIX, "");
+                        const cleanLabel = option.value.replace(CREATE_PREFIX, "");
                         return (
                             <Group gap="xs">
                                 <TbPlus size={16}/>
@@ -110,7 +114,7 @@ export function CustomAutocompleteWithCreate({
                             </Group>
                         );
                     }
-                    return item.label;
+                    return option.value;
                 }}
                 {...remainingProps}
             />

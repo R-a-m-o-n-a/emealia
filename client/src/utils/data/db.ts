@@ -22,7 +22,7 @@ export class EmealiaDB extends Dexie {
     mealTagRelations!: Table<MealTagRelation>;
 
     constructor() {
-        super('MealPlannerDB');
+        super('EmealiaDB');
 
         // Index only fields needed for primary keys, foreign keys, and fast sync queries
         this.version(1).stores({

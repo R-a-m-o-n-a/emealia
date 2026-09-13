@@ -35,5 +35,7 @@ export async function addCategoryIfNew(userId: string, categoryName: string): Pr
     };
 
     await db.categories.add(newCategory);
+
+    // todo sync engine
     return newCategory.id;
 }

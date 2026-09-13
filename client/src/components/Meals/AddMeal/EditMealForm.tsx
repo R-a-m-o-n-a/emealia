@@ -1,7 +1,7 @@
 import type {Meal} from "@emealia/shared";
 import {Button, Group, Switch, Textarea, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import "./EditMealForm.css";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import {useTagsAndCategories} from "../../../hooks/useTagsAndCategories.tsx";
@@ -22,14 +22,11 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
     const {userId} = useAuth();
     const tagsAndCategories = useTagsAndCategories(userId);
 
-    // Format options into clean { label, value } structures using useMemo
-    const categoryOptions = useMemo(
-        () => (tagsAndCategories?.categories ?? []).map((c) => ({label: c.name, value: c.id})),
-        [tagsAndCategories?.categories]
-    );
 
     const tags = tagsAndCategories?.tags ?? [];
+    const categories = tagsAndCategories?.categories ?? [];
     const tagNames = tags.map((tag) => tag.name);
+    const categoryNames = categories.map((category) => category.name);
 
     const [recipeLink, setRecipeLink] = useState<string>(existingMeal?.recipeLink ?? "");
     const [videoLink, setVideoLink] = useState<string>(existingMeal?.videoLink ?? "");
@@ -38,7 +35,7 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
         mode: "uncontrolled",
         initialValues: {
             title: "",
-            categoryId: "",
+            categoryName: "",
             freeText: "",
             isPrivate: false,
             isToTry: false,
@@ -53,14 +50,14 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
         if (existingMeal) {
             form.initialize({
                 title: existingMeal.title,
-                categoryId: existingMeal.categoryId || "",
+                categoryName: tagsAndCategories?.categories.find(category => category.id === existingMeal.categoryId)?.name ?? "",
                 freeText: existingMeal.freeText || "",
                 isPrivate: existingMeal.isPrivate || false,
                 isToTry: existingMeal.isToTry || false,
                 tagNames: [], // todo fetch mealtagrelations
             });
         }
-    }, [existingMeal, form]);
+    }, [existingMeal, form, tagsAndCategories]);
 
     const handleCreateCategory = async (name: string): Promise<string | null> => {
         if (!userId) return null;
@@ -82,8 +79,8 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
                 freeText: values.freeText,
                 isPrivate: values.isPrivate,
                 isToTry: values.isToTry,
-                categoryId: values.categoryId,
-                tagNames: values.tagNames,
+                categoryId: tagsAndCategories?.categories.find(category => category.name === values.categoryName)?.id,
+                tagIds: tagsAndCategories?.tags.filter((tag) => values.tagNames.includes(tag.name)).map((tag) => tag.id),
                 recipeLink,
                 videoLink,
             });
@@ -110,10 +107,10 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
 
             <CustomAutocompleteWithCreate
                 placeholder={t("Choose Category")}
-                options={categoryOptions}
+                options={categoryNames}
                 onCreate={handleCreateCategory}
-                key={form.key("categoryId")}
-                {...form.getInputProps("categoryId")}
+                key={form.key("categoryName")}
+                {...form.getInputProps("categoryName")}
             />
 
             <Switch
@@ -138,8 +135,8 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
                 placeholder={t("Select or add tags")}
                 availableOptions={tagNames}
                 onAddNewOption={handleCreateTag}
-                key={form.key("tagIds")}
-                {...form.getInputProps("tagIds")}
+                key={form.key("tagNames")}
+                {...form.getInputProps("tagNames")}
             />
 
             <Group justify="flex-end" mt="md">

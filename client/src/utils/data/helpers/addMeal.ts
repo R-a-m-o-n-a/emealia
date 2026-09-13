@@ -1,5 +1,6 @@
 import type {Meal, MealTagRelation} from "@emealia/shared";
 import {db} from "../db";
+import {syncEngine} from "../syncEngine.ts";
 
 export interface CreateMealInput {
     title: string;
@@ -8,7 +9,7 @@ export interface CreateMealInput {
     isPrivate?: boolean;
     isToTry?: boolean;
     categoryId?: string;
-    tagNames?: string[];
+    tagIds?: string[];
     recipeLink?: string;
     videoLink?: string;
 }
@@ -33,41 +34,39 @@ export async function addMeal(userId: string, input: CreateMealInput): Promise<s
         updatedAt: now
     };
 
-    const tagNames = input.tagNames ?? [];
+    const tagIds = input.tagIds ?? [];
 
-    if (tagNames.length === 0) {
+    if (tagIds.length === 0) {
         await db.meals.add(newMeal);
     } else {
         await db.transaction("rw", [db.meals, db.tags, db.mealTagRelations], async () => {
             await db.meals.add(newMeal);
 
-            const foundTags = await db.tags.where("name").anyOf(tagNames).toArray();
-            const foundTagMap = new Map(foundTags.map(tag => [tag.name, tag.id]));
-
             const relationsToInsert: MealTagRelation[] = [];
 
-            for (const tagName of tagNames) {
-                const tagId = foundTagMap.get(tagName);
-                if (!tagId) {
-                    console.error(`Tag "${tagName}" not found for meal ${mealId}`);
-                } else {
-                    relationsToInsert.push({
-                        userId,
-                        syncStatus: "pending",
-                        isDeleted: false,
-                        updatedAt: now,
-                        id: crypto.randomUUID(),
-                        mealId,
-                        tagId: tagId,
-                        createdAt: now,
-                    });
-                }
+            for (const tagId of tagIds) {
+                relationsToInsert.push({
+                    userId,
+                    syncStatus: "pending",
+                    isDeleted: false,
+                    updatedAt: now,
+                    id: crypto.randomUUID(),
+                    mealId,
+                    tagId: tagId,
+                    createdAt: now,
+                });
             }
 
             if (relationsToInsert.length > 0) {
                 await db.mealTagRelations.bulkAdd(relationsToInsert);
             }
         }).catch(err => console.error("Adding meal transaction failed:", err));
+
+        await syncEngine.runSync().catch((err) => {
+            console.log(err)
+        }).then(() => {
+            console.log("Sync done");
+        });
     }
 
     return mealId;

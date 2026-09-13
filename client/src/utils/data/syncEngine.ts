@@ -22,6 +22,7 @@ export class SyncEngine {
     private isSyncing = false;
 
     async runSync(): Promise<void> {
+        console.log('Sync engine', this.isSyncing, navigator.onLine);
         if (this.isSyncing || !navigator.onLine) return;
         this.isSyncing = true;
         const syncStartTime = new Date().toISOString();

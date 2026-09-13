@@ -37,5 +37,6 @@ export async function addTagIfNew(userId: string, tagName: string): Promise<stri
     };
 
     await db.tags.add(newTag);
+    // todo sync engine
     return newTag.id;
 }
