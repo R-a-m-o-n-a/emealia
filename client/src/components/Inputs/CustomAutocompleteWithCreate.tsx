@@ -16,7 +16,6 @@ interface CustomAutocompleteWithCreateProps {
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
-// todo use value as key?
 export function CustomAutocompleteWithCreate({
                                                  options,
                                                  value = "",
@@ -38,7 +37,7 @@ export function CustomAutocompleteWithCreate({
         });
     }, [options]);
 
-    const computedData = useMemo<string[]>(() => {
+    const optionsPlusAddOption = useMemo<string[]>(() => {
         const query = inputValue.trim();
         if (!query) return options;
 
@@ -48,7 +47,11 @@ export function CustomAutocompleteWithCreate({
             (option) => option.toLowerCase() === query.toLowerCase()
         );
 
-        if (!exactMatch) {
+        if (exactMatch) {
+            if (results.length <= 1) {
+                return [];
+            }
+        } else {
             results.push(`${CREATE_PREFIX}${query}`);
         }
 
@@ -97,12 +100,13 @@ export function CustomAutocompleteWithCreate({
     return (
         <>
             <Autocomplete
-                placeholder={placeholder}
-                data={computedData}
-                value={inputValue}
-                selectFirstOptionOnChange
-                onOptionSubmit={handleOptionSubmit}
+                clearable
+                data={optionsPlusAddOption}
                 onChange={handleInputChange}
+                onOptionSubmit={handleOptionSubmit}
+                placeholder={placeholder}
+                selectFirstOptionOnChange
+                value={inputValue}
                 renderOption={({option}) => {
                     const isCreate = option.value.startsWith(CREATE_PREFIX);
                     if (isCreate) {
