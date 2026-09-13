@@ -62,12 +62,14 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
         const trimmed = newTag.trim();
         if (!trimmed || !userId) return;
 
-        await addTagIfNew(userId, trimmed);
+        const tagId = await addTagIfNew(userId, trimmed);
+        return tagId;
     };
 
     const handleCreateCategory = async (newCategory: string) => {
         if (!userId) return "";
-        return await addCategoryIfNew(userId, newCategory);
+        const categoryId = await addCategoryIfNew(userId, newCategory);
+        return categoryId;
     };
 
     const handleSubmit = async (values: typeof form.values) => {
@@ -80,7 +82,8 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
                 freeText: values.freeText,
                 isPrivate: values.isPrivate,
                 isToTry: values.isToTry,
-                tags: values.tags,
+                categoryId: values.category,
+                tagIds: values.tags,
                 recipeLink,
                 videoLink,
             });
@@ -96,7 +99,7 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
             console.error("Failed to add meal:", error);
         }
     };
-
+    
     return (
         <form onSubmit={form.onSubmit(handleSubmit)} className="EditMealForm">
             <TextInput
