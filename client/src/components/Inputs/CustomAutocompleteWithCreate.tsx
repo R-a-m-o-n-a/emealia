@@ -7,11 +7,11 @@ import {t} from "../../utils/translate.ts";
 const CREATE_PREFIX = "$create:";
 
 interface CustomAutocompleteWithCreateProps {
-    options: string[];
+    options: { label: string, value: string }[];
     value?: string;
     defaultValue?: string;
     onChange?: (val: string) => void;
-    onCreateCategory: (categoryName: string) => Promise<unknown>;
+    onCreate: (name: string) => Promise<string | null>;
     placeholder?: string;
     onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
@@ -22,7 +22,7 @@ export function CustomAutocompleteWithCreate({
                                                  value,
                                                  defaultValue,
                                                  onChange,
-                                                 onCreateCategory,
+                                                 onCreate,
                                                  placeholder,
                                                  ...remainingProps
                                              }: CustomAutocompleteWithCreateProps) {
@@ -34,14 +34,10 @@ export function CustomAutocompleteWithCreate({
     // Dynamically compute options so Mantine's `data` includes the dynamic create option, otherwise there will be an error since it cannot access the label of the "add Category" option
     const computedData = useMemo<ComboboxItem[]>(() => {
         const query = searchValue.trim();
-        const baseOptions: ComboboxItem[] = options.map((opt) => ({
-            value: opt,
-            label: opt,
-        }));
 
-        if (!query) return baseOptions;
+        if (!query) return options;
 
-        const fuse = new Fuse(baseOptions, {
+        const fuse = new Fuse(options, {
             keys: ["label"],
             threshold: 0.3,
             minMatchCharLength: 1,
@@ -50,7 +46,7 @@ export function CustomAutocompleteWithCreate({
         const results = fuse.search(query).map((res) => res.item);
 
         const exactMatch = options.some(
-            (option) => option.toLowerCase() === query.toLowerCase()
+            (option) => option.label.toLowerCase() === query.toLowerCase()
         );
 
         if (!exactMatch) {
@@ -77,7 +73,7 @@ export function CustomAutocompleteWithCreate({
         if (!pendingCategory) return;
         setIsSubmitting(true);
         try {
-            await onCreateCategory(pendingCategory);
+            await onCreate(pendingCategory);
             onChange?.(pendingCategory);
             setModalOpened(false);
         } finally {
@@ -103,9 +99,10 @@ export function CustomAutocompleteWithCreate({
                 // Disable internal component filtering as computedData handles it
                 filter={({options: opts}) => opts}
                 renderOption={({option}) => {
-                    const isCreate = option.value.startsWith(CREATE_PREFIX);
+                    const item = option as ComboboxItem;
+                    const isCreate = item.label.startsWith(CREATE_PREFIX);
                     if (isCreate) {
-                        const cleanLabel = option.value.replace(CREATE_PREFIX, "");
+                        const cleanLabel = item.label.replace(CREATE_PREFIX, "");
                         return (
                             <Group gap="xs">
                                 <TbPlus size={16}/>
@@ -113,7 +110,7 @@ export function CustomAutocompleteWithCreate({
                             </Group>
                         );
                     }
-                    return option.value;
+                    return item.label;
                 }}
                 {...remainingProps}
             />

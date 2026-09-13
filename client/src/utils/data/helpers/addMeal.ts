@@ -8,7 +8,7 @@ export interface CreateMealInput {
     isPrivate?: boolean;
     isToTry?: boolean;
     categoryId?: string;
-    tagIds?: string[];
+    tagNames?: string[];
     recipeLink?: string;
     videoLink?: string;
 }
@@ -33,25 +33,42 @@ export async function addMeal(userId: string, input: CreateMealInput): Promise<s
         updatedAt: now
     };
 
-    await db.transaction("rw", [db.meals, db.tags, db.mealTagRelations], async () => {
-        await db.meals.add(newMeal);
+    const tagNames = input.tagNames ?? [];
 
-        if (input.tagIds && input.tagIds.length > 0) {
-            for (const tagId of input.tagIds) {
-                const relation: MealTagRelation = {
-                    userId,
-                    syncStatus: "pending",
-                    isDeleted: false,
-                    updatedAt: now,
-                    id: crypto.randomUUID(),
-                    mealId,
-                    tagId,
-                    createdAt: now,
-                };
-                await db.mealTagRelations.add(relation);
+    if (tagNames.length === 0) {
+        await db.meals.add(newMeal);
+    } else {
+        await db.transaction("rw", [db.meals, db.tags, db.mealTagRelations], async () => {
+            await db.meals.add(newMeal);
+
+            const foundTags = await db.tags.where("name").anyOf(tagNames).toArray();
+            const foundTagMap = new Map(foundTags.map(tag => [tag.name, tag.id]));
+
+            const relationsToInsert: MealTagRelation[] = [];
+
+            for (const tagName of tagNames) {
+                const tagId = foundTagMap.get(tagName);
+                if (!tagId) {
+                    console.error(`Tag "${tagName}" not found for meal ${mealId}`);
+                } else {
+                    relationsToInsert.push({
+                        userId,
+                        syncStatus: "pending",
+                        isDeleted: false,
+                        updatedAt: now,
+                        id: crypto.randomUUID(),
+                        mealId,
+                        tagId: tagId,
+                        createdAt: now,
+                    });
+                }
             }
-        }
-    });
+
+            if (relationsToInsert.length > 0) {
+                await db.mealTagRelations.bulkAdd(relationsToInsert);
+            }
+        }).catch(err => console.error("Adding meal transaction failed:", err));
+    }
 
     return mealId;
 }

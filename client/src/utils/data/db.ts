@@ -27,7 +27,7 @@ export class EmealiaDB extends Dexie {
         // Index only fields needed for primary keys, foreign keys, and fast sync queries
         this.version(1).stores({
             categories: '&id, userId, syncStatus, updatedAt',
-            tags: '&id, userId, syncStatus, updatedAt',
+            tags: '&id, userId, syncStatus, updatedAt, &name',
             mealImages: '&id, userId, mealId, syncStatus, updatedAt',
             missingIngredients: '&id, userId, planId, syncStatus, updatedAt',
             meals: '&id, userId, categoryId, syncStatus, updatedAt',

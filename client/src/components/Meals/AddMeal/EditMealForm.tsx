@@ -1,7 +1,7 @@
 import type {Meal} from "@emealia/shared";
 import {Button, Group, Switch, Textarea, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import "./EditMealForm.css";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import {useTagsAndCategories} from "../../../hooks/useTagsAndCategories.tsx";
@@ -22,9 +22,13 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
     const {userId} = useAuth();
     const tagsAndCategories = useTagsAndCategories(userId);
 
-    const categories = tagsAndCategories?.categories ?? [];
+    // Format options into clean { label, value } structures using useMemo
+    const categoryOptions = useMemo(
+        () => (tagsAndCategories?.categories ?? []).map((c) => ({label: c.name, value: c.id})),
+        [tagsAndCategories?.categories]
+    );
+
     const tags = tagsAndCategories?.tags ?? [];
-    const categoryNames = categories.map((category) => category.name);
     const tagNames = tags.map((tag) => tag.name);
 
     const [recipeLink, setRecipeLink] = useState<string>(existingMeal?.recipeLink ?? "");
@@ -34,11 +38,11 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
         mode: "uncontrolled",
         initialValues: {
             title: "",
-            category: "",
+            categoryId: "",
             freeText: "",
             isPrivate: false,
             isToTry: false,
-            tags: [] as string[],
+            tagNames: [] as string[],
         },
         validate: {
             title: (value) => (value.trim().length > 0 ? null : t("Your meal needs a title")),
@@ -49,27 +53,24 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
         if (existingMeal) {
             form.initialize({
                 title: existingMeal.title,
-                category: existingMeal.categoryId || "", // todo fetch category name
+                categoryId: existingMeal.categoryId || "",
                 freeText: existingMeal.freeText || "",
                 isPrivate: existingMeal.isPrivate || false,
                 isToTry: existingMeal.isToTry || false,
-                tags: [], // todo fetch tags
+                tagNames: [], // todo fetch mealtagrelations
             });
         }
     }, [existingMeal, form]);
 
-    const handleAddNewTag = async (newTag: string) => {
-        const trimmed = newTag.trim();
-        if (!trimmed || !userId) return;
-
-        const tagId = await addTagIfNew(userId, trimmed);
-        return tagId;
+    const handleCreateCategory = async (name: string): Promise<string | null> => {
+        if (!userId) return null;
+        return await addCategoryIfNew(userId, name);
     };
 
-    const handleCreateCategory = async (newCategory: string) => {
-        if (!userId) return "";
-        const categoryId = await addCategoryIfNew(userId, newCategory);
-        return categoryId;
+    const handleCreateTag = async (name: string): Promise<string | null> => {
+        const trimmed = name.trim();
+        if (!trimmed || !userId) return null;
+        return await addTagIfNew(userId, trimmed);
     };
 
     const handleSubmit = async (values: typeof form.values) => {
@@ -78,12 +79,11 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
         try {
             await addMeal(userId, {
                 title: values.title,
-                category: values.category,
                 freeText: values.freeText,
                 isPrivate: values.isPrivate,
                 isToTry: values.isToTry,
-                categoryId: values.category,
-                tagIds: values.tags,
+                categoryId: values.categoryId,
+                tagNames: values.tagNames,
                 recipeLink,
                 videoLink,
             });
@@ -92,14 +92,12 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
             setRecipeLink("");
             setVideoLink("");
 
-            if (onSuccess) {
-                onSuccess();
-            }
+            onSuccess?.();
         } catch (error) {
             console.error("Failed to add meal:", error);
         }
     };
-    
+
     return (
         <form onSubmit={form.onSubmit(handleSubmit)} className="EditMealForm">
             <TextInput
@@ -112,10 +110,10 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
 
             <CustomAutocompleteWithCreate
                 placeholder={t("Choose Category")}
-                options={categoryNames}
-                onCreateCategory={handleCreateCategory}
-                key={form.key("category")}
-                {...form.getInputProps("category")}
+                options={categoryOptions}
+                onCreate={handleCreateCategory}
+                key={form.key("categoryId")}
+                {...form.getInputProps("categoryId")}
             />
 
             <Switch
@@ -123,22 +121,25 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
                 key={form.key("isPrivate")}
                 {...form.getInputProps("isPrivate", {type: "checkbox"})}
             />
+
             <Switch
                 label={t("To Try")}
                 key={form.key("isToTry")}
                 {...form.getInputProps("isToTry", {type: "checkbox"})}
             />
+
             <Textarea
                 placeholder={t("Here you can type anything your heart desires")}
                 key={form.key("freeText")}
                 {...form.getInputProps("freeText")}
             />
+
             <CustomTagsInput
                 placeholder={t("Select or add tags")}
                 availableOptions={tagNames}
-                onAddNewOption={handleAddNewTag}
-                key={form.key("tags")}
-                {...form.getInputProps("tags")}
+                onAddNewOption={handleCreateTag}
+                key={form.key("tagIds")}
+                {...form.getInputProps("tagIds")}
             />
 
             <Group justify="flex-end" mt="md">
