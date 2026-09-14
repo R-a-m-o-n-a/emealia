@@ -1,20 +1,9 @@
 import type {Meal, MealTagRelation} from "@emealia/shared";
 import {db} from "../db";
 import {syncEngine} from "../syncEngine.ts";
+import type {UpsertMealInput} from "./updateMeal.ts";
 
-export interface CreateMealInput {
-    title: string;
-    category?: string;
-    freeText?: string;
-    isPrivate?: boolean;
-    isToTry?: boolean;
-    categoryId?: string;
-    tagIds?: string[];
-    recipeLink?: string;
-    videoLink?: string;
-}
-
-export async function addMeal(userId: string, input: CreateMealInput): Promise<string> {
+export async function addMeal(userId: string, input: UpsertMealInput): Promise<string> {
     const mealId = crypto.randomUUID();
     const now = new Date().toISOString();
 
@@ -61,13 +50,13 @@ export async function addMeal(userId: string, input: CreateMealInput): Promise<s
                 await db.mealTagRelations.bulkAdd(relationsToInsert);
             }
         }).catch(err => console.error("Adding meal transaction failed:", err));
-
-        await syncEngine.runSync().catch((err) => {
-            console.log(err)
-        }).then(() => {
-            console.log("Sync done");
-        });
     }
+
+    await syncEngine.runSync().catch((err) => {
+        console.log(err)
+    }).then(() => {
+        console.log("Sync done");
+    });
 
     return mealId;
 }

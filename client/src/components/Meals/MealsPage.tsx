@@ -4,7 +4,7 @@ import {ButtonGroup} from "../Buttons/ButtonGroup.tsx";
 import {MenuButton} from "../Buttons/MenuButton.tsx";
 import {SearchButton} from "../Buttons/SearchButton.tsx";
 import {Navbar} from "../Navbar/Navbar.tsx";
-import {MealsList} from "./MealsList.tsx";
+import {MealsList} from "./MealsList/MealsList.tsx";
 
 export function MealsPage() {
     return (

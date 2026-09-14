@@ -8,6 +8,7 @@ import {useTagsAndCategories} from "../../../hooks/useTagsAndCategories.tsx";
 import {addCategoryIfNew} from "../../../utils/data/helpers/addCategoryIfNew.ts";
 import {addMeal} from "../../../utils/data/helpers/addMeal.ts";
 import {addTagIfNew} from "../../../utils/data/helpers/addTagIfNew.ts";
+import {updateMeal} from "../../../utils/data/helpers/updateMeal.ts";
 import {t} from "../../../utils/translate.ts";
 import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithCreate.tsx";
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
@@ -73,22 +74,24 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
     const handleSubmit = async (values: typeof form.values) => {
         if (!userId) return;
 
+        const upsertMealInput = {
+            title: values.title,
+            freeText: values.freeText,
+            isPrivate: values.isPrivate,
+            isToTry: values.isToTry,
+            categoryId: tagsAndCategories?.categories.find(category => category.name === values.categoryName)?.id,
+            tagIds: tagsAndCategories?.tags.filter((tag) => values.tagNames.includes(tag.name)).map((tag) => tag.id),
+            recipeLink,
+            videoLink,
+        }
+
         try {
-            await addMeal(userId, {
-                title: values.title,
-                freeText: values.freeText,
-                isPrivate: values.isPrivate,
-                isToTry: values.isToTry,
-                categoryId: tagsAndCategories?.categories.find(category => category.name === values.categoryName)?.id,
-                tagIds: tagsAndCategories?.tags.filter((tag) => values.tagNames.includes(tag.name)).map((tag) => tag.id),
-                recipeLink,
-                videoLink,
-            });
-
-            form.reset();
-            setRecipeLink("");
-            setVideoLink("");
-
+            if (existingMeal?.id) {
+                await updateMeal(userId, existingMeal.id, upsertMealInput)
+            } else {
+                await addMeal(userId, upsertMealInput);
+            }
+            // todo close window
             onSuccess?.();
         } catch (error) {
             console.error("Failed to add meal:", error);
