@@ -1,8 +1,12 @@
-import { useLoaderData, useParams } from "react-router";
+import {useParams} from "react-router";
+import {useMeal} from "../../../utils/data/helpers/useMeal.ts";
 
 export function MealDetailPage() {
-    let params = useParams();
-    let data = useLoaderData();
+    const params = useParams();
     const {id: mealId} = params;
-    return <h1>{data.mealId}, {mealId}</h1>;
+    const meal = useMeal(mealId);
+    if (!meal) {
+        return "Loading...";
+    }
+    return <h1>{meal.title}, {mealId}</h1>;
 }
