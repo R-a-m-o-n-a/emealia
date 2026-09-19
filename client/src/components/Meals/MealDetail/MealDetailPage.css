@@ -2,12 +2,14 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    align-items: center;
     gap: 5px;
 }
 
-.MealDetailPage-info span {
-    padding-right: 5px;
-    border-right: 1px solid grey; /* todo color */
+.MealDetailPage-info div.separatorLine {
+    width: 1px;
+    align-self: stretch;
+    background: grey; /* todo color */
 }
 
 .MealDetailPage-text {

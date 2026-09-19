@@ -5,12 +5,12 @@ import {useNavigate} from 'react-router';
 export function BackButton() {
     const navigate = useNavigate();
 
-    const handleBack = () => navigate(-1);
+    const navigateBack = () => navigate(-1);
 
     return (
         <ActionIcon
             aria-label="Go back"
-            onClick={handleBack}
+            onClick={navigateBack}
             style={{paddingRight: '1px'}}
         >
             <TbChevronLeft size={20}/>

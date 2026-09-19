@@ -3,6 +3,7 @@ import {RootErrorBoundary} from "./components/Errors/RootErrorBoundary.tsx";
 import {FloatingNavLayout} from "./components/Layout/FloatingNavLayout.tsx";
 import {RootLayout} from './components/Layout/RootLayout.tsx';
 import {AddMealPage} from "./components/Meals/AddMeal/AddMealPage.tsx";
+import {EditMealPage} from "./components/Meals/AddMeal/EditMealPage.tsx";
 import {MealDetailPage} from "./components/Meals/MealDetail/MealDetailPage.tsx";
 import {MealsPage} from "./components/Meals/MealsPage.tsx";
 import {PlansPage} from "./components/Plans/PlansPage.tsx";
@@ -39,11 +40,10 @@ export const router = createBrowserRouter([
             {
                 path: 'meals/:id',
                 Component: MealDetailPage,
-                loader: /*async*/ ({params}) => {
-                    // params are available in loaders/actions
-                    // let team = await fetchTeam(params.teamId);
-                    return {mealId: params.id};
-                },
+            },
+            {
+                path: 'meals/edit/:id',
+                Component: EditMealPage,
             },
         ],
     },

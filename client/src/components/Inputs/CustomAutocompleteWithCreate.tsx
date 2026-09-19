@@ -8,7 +8,7 @@ const CREATE_PREFIX = "$create:";
 
 interface CustomAutocompleteWithCreateProps {
     options: string[];
-    value?: string;
+    defaultValue?: string;
     onChange?: (val: string) => void;
     onCreate: (name: string) => Promise<string | null>;
     placeholder?: string;
@@ -18,7 +18,7 @@ interface CustomAutocompleteWithCreateProps {
 
 export function CustomAutocompleteWithCreate({
                                                  options,
-                                                 value = "",
+                                                 defaultValue,
                                                  onChange,
                                                  onCreate,
                                                  placeholder,
@@ -28,7 +28,7 @@ export function CustomAutocompleteWithCreate({
     const [pendingCategory, setPendingCategory] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [inputValue, setInputValue] = useState(value);
+    const [inputValue, setInputValue] = useState(defaultValue ?? "");
 
     const fuse = useMemo(() => {
         return new Fuse(options, {

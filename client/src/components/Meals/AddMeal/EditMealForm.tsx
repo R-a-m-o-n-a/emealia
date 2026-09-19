@@ -1,4 +1,4 @@
-import type {Meal} from "@emealia/shared";
+import type {Meal, Tag} from "@emealia/shared";
 import {Button, Group, Switch, Textarea, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
 import {useEffect, useState} from "react";
@@ -15,14 +15,13 @@ import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
 
 interface EditMealFormProps {
     existingMeal?: Meal;
+    existingTags?: Tag[];
     onSuccess?: () => void;
 }
 
-// todo use mealId as key when calling the component to reset state if meal changes
-export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
+export function EditMealForm({existingMeal, existingTags, onSuccess}: EditMealFormProps) {
     const {userId} = useAuth();
     const tagsAndCategories = useTagsAndCategoriesByUser(userId);
-
 
     const tags = tagsAndCategories?.tags ?? [];
     const categories = tagsAndCategories?.categories ?? [];
@@ -48,17 +47,39 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
     });
 
     useEffect(() => {
-        if (existingMeal) {
-            form.initialize({
-                title: existingMeal.title,
-                categoryName: tagsAndCategories?.categories.find(category => category.id === existingMeal.categoryId)?.name ?? "",
-                freeText: existingMeal.freeText || "",
-                isPrivate: existingMeal.isPrivate || false,
-                isToTry: existingMeal.isToTry || false,
-                tagNames: [], // todo fetch mealtagrelations
-            });
+        if (!existingMeal) return;
+
+        form.initialize({
+            title: existingMeal.title,
+            categoryName: "",
+            freeText: existingMeal.freeText || "",
+            isPrivate: existingMeal.isPrivate || false,
+            isToTry: existingMeal.isToTry || false,
+            tagNames: [],
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [existingMeal]);
+
+    useEffect(() => {
+        if (!existingMeal || !tagsAndCategories?.categories) return;
+
+        const matchedCategory = tagsAndCategories.categories.find(
+            (category) => category.id === existingMeal.categoryId
+        );
+
+        if (matchedCategory) {
+            form.setFieldValue("categoryName", matchedCategory.name);
+            console.log('initializing category with', matchedCategory.name);
         }
-    }, [existingMeal, form, tagsAndCategories]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [existingMeal, tagsAndCategories?.categories]);
+
+    useEffect(() => {
+        if (!existingTags) return;
+
+        form.setFieldValue("tagNames", existingTags.map((tag) => tag.name));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [existingTags]);
 
     const handleCreateCategory = async (name: string): Promise<string | null> => {
         if (!userId) return null;
@@ -83,11 +104,11 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
             tagIds: tagsAndCategories?.tags.filter((tag) => values.tagNames.includes(tag.name)).map((tag) => tag.id),
             recipeLink,
             videoLink,
-        }
+        };
 
         try {
             if (existingMeal?.id) {
-                await updateMeal(userId, existingMeal.id, upsertMealInput)
+                await updateMeal(userId, existingMeal.id, upsertMealInput);
             } else {
                 await addMeal(userId, upsertMealInput);
             }
@@ -112,7 +133,7 @@ export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
                 placeholder={t("Choose Category")}
                 options={categoryNames}
                 onCreate={handleCreateCategory}
-                key={form.key("categoryName")}
+                key={`${form.key("categoryName")}`}
                 {...form.getInputProps("categoryName")}
             />
 
