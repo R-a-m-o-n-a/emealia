@@ -1,0 +1,15 @@
+.MealDetailPage-info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.MealDetailPage-info span {
+    padding-right: 5px;
+    border-right: 1px solid grey; /* todo color */
+}
+
+.MealDetailPage-text {
+
+}

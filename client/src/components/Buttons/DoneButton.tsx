@@ -4,7 +4,7 @@ import {TbCheck} from "react-icons/tb";
 export function DoneButton({}) {
     return (
         <ActionIcon
-            aria-label="Search for a meal"
+            aria-label="Done"
         >
             <TbCheck size={20}/>
         </ActionIcon>

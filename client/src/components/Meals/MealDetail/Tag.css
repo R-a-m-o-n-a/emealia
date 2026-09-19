@@ -1,0 +1,8 @@
+.Tag {
+    border-radius: 6px;
+    background: var(--mantine-primary-color-filled);
+    width: fit-content;
+    padding: 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+}

@@ -4,11 +4,11 @@ import {useForm} from "@mantine/form";
 import {useEffect, useState} from "react";
 import "./EditMealForm.css";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
-import {useTagsAndCategories} from "../../../hooks/useTagsAndCategories.tsx";
 import {addCategoryIfNew} from "../../../utils/data/helpers/addCategoryIfNew.ts";
 import {addMeal} from "../../../utils/data/helpers/addMeal.ts";
 import {addTagIfNew} from "../../../utils/data/helpers/addTagIfNew.ts";
 import {updateMeal} from "../../../utils/data/helpers/updateMeal.ts";
+import {useTagsAndCategoriesByUser} from "../../../utils/data/helpers/useTagsAndCategoriesByUser.tsx";
 import {t} from "../../../utils/translate.ts";
 import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithCreate.tsx";
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
@@ -21,7 +21,7 @@ interface EditMealFormProps {
 // todo use mealId as key when calling the component to reset state if meal changes
 export function EditMealForm({existingMeal, onSuccess}: EditMealFormProps) {
     const {userId} = useAuth();
-    const tagsAndCategories = useTagsAndCategories(userId);
+    const tagsAndCategories = useTagsAndCategoriesByUser(userId);
 
 
     const tags = tagsAndCategories?.tags ?? [];

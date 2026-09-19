@@ -1,8 +1,8 @@
 import type {Category, Tag} from "@emealia/shared";
 import {useLiveQuery} from 'dexie-react-hooks';
-import {db} from "../utils/data/db.ts";
+import {db} from "../db.ts";
 
-export function useTagsAndCategories(userId: string) {
+export function useTagsAndCategoriesByUser(userId: string) {
     return useLiveQuery(async (): Promise<{ categories: Category[]; tags: Tag[] }> => {
         if (!userId) return {categories: [], tags: []};
 
