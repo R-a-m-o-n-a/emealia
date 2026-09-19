@@ -69,7 +69,6 @@ export function EditMealForm({existingMeal, existingTags, onSuccess}: EditMealFo
 
         if (matchedCategory) {
             form.setFieldValue("categoryName", matchedCategory.name);
-            console.log('initializing category with', matchedCategory.name);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [existingMeal, tagsAndCategories?.categories]);
@@ -112,7 +111,6 @@ export function EditMealForm({existingMeal, existingTags, onSuccess}: EditMealFo
             } else {
                 await addMeal(userId, upsertMealInput);
             }
-            // todo close window
             onSuccess?.();
         } catch (error) {
             console.error("Failed to add meal:", error);
@@ -120,7 +118,7 @@ export function EditMealForm({existingMeal, existingTags, onSuccess}: EditMealFo
     };
 
     return (
-        <form onSubmit={form.onSubmit(handleSubmit)} className="EditMealForm">
+        <form id="edit-meal-form" onSubmit={form.onSubmit(handleSubmit)} className="EditMealForm">
             <TextInput
                 radius="sm"
                 placeholder={t("Title")}

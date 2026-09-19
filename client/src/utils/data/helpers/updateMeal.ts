@@ -75,7 +75,7 @@ export async function updateMeal(
         }
     }).catch(err => console.error("Updating meal transaction failed:", err));
 
-    await syncEngine.runSync().catch(err => console.log(err)).then(() => {
+    syncEngine.runSync().catch(err => console.log(err)).then(() => {
         console.log("Sync done");
     });
 }

@@ -4,7 +4,7 @@ import {DoneButton} from "../../Buttons/DoneButton.tsx";
 import {Navbar} from "../../Navbar/Navbar.tsx";
 import {EditMealForm} from "./EditMealForm.tsx";
 
-export function AddMealPage({}) {
+export function AddMealPage() {
     return (
         <div className={"AddMealPage"}>
             <Navbar>

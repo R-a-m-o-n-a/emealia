@@ -6,7 +6,7 @@ export function MealListItem({meal}: { meal: Meal }) {
     const navigate = useNavigate();
 
     function openDetailPage() {
-        navigate(`/meals/${meal.id}`);
+        navigate(`/meals/${meal.id}`, {state: {hasValidBackNavigation: true}});
     }
 
     return (

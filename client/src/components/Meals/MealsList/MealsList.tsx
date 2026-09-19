@@ -16,6 +16,7 @@ export function MealsList() {
     }
 
     const {meals, categoryMap, tagMap} = result;
+    tagMap.values(); // todo filters (added this line just to remove linting error of unused var for now
 
     const mealsByCategory = meals.reduce<Record<string, typeof meals>>((acc, meal) => {
         const categoryId = meal.categoryId ?? UNCATEGORIZED_KEY;
@@ -44,7 +45,7 @@ export function MealsList() {
                     <section key={categoryId} className="MealsList-categoryGroup">
                         <CategorySectionHeader name={categoryName} id={categoryId}/>
                         {categoryMeals.map((meal) => (
-                            <MealListItem meal={meal}/>
+                            <MealListItem key={meal.id} meal={meal}/>
                         ))}
                     </section>
                 );

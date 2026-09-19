@@ -52,7 +52,7 @@ export async function addMeal(userId: string, input: UpsertMealInput): Promise<s
         }).catch(err => console.error("Adding meal transaction failed:", err));
     }
 
-    await syncEngine.runSync().catch((err) => {
+    syncEngine.runSync().catch((err) => {
         console.log(err)
     }).then(() => {
         console.log("Sync done");
