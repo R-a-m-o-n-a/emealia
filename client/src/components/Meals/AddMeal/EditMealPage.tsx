@@ -12,9 +12,11 @@ export function EditMealPage() {
     const location = useLocation();
     const params = useParams();
     const {id: mealId} = params;
-    const meal = useMeal(mealId);
-    const tags = useTagsByMealId(mealId);
-    console.log(location)
+    const mealFromDb = useMeal(mealId);
+    const tagsFromDb = useTagsByMealId(mealId);
+
+    const meal = mealFromDb ?? location.state?.meal;
+    const tags = tagsFromDb ?? location.state?.tags;
 
     function navigateToDetails() {
         const cameFromDetails = location.state?.fromDetails;
@@ -38,6 +40,7 @@ export function EditMealPage() {
                 key={mealId}
                 existingMeal={meal}
                 existingTags={tags}
+                existingCategoryName={location.state?.category?.name}
                 onSuccess={navigateToDetails}
             />
         </div>

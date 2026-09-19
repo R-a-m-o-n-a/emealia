@@ -16,10 +16,11 @@ import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
 interface EditMealFormProps {
     existingMeal?: Meal;
     existingTags?: Tag[];
+    existingCategoryName?: string;
     onSuccess?: () => void;
 }
 
-export function EditMealForm({existingMeal, existingTags, onSuccess}: EditMealFormProps) {
+export function EditMealForm({existingMeal, existingTags, existingCategoryName, onSuccess}: EditMealFormProps) {
     const {userId} = useAuth();
     const tagsAndCategories = useTagsAndCategoriesByUser(userId);
 
@@ -51,7 +52,7 @@ export function EditMealForm({existingMeal, existingTags, onSuccess}: EditMealFo
 
         form.initialize({
             title: existingMeal.title,
-            categoryName: "",
+            categoryName: existingCategoryName ?? "",
             freeText: existingMeal.freeText || "",
             isPrivate: existingMeal.isPrivate || false,
             isToTry: existingMeal.isToTry || false,

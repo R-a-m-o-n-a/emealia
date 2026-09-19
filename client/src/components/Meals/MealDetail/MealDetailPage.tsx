@@ -25,7 +25,7 @@ export function MealDetailPage() {
     const tags = useTagsByMealId(mealId);
 
     function navigateToEdit() {
-        navigate(`/meals/edit/${mealId}`, {state: {fromDetails: true}});
+        navigate(`/meals/edit/${mealId}`, {state: {fromDetails: true, meal, tags, category}});
     }
 
     function navigateBackOrToMeals() {
