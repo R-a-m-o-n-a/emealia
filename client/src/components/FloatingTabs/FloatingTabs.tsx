@@ -1,7 +1,6 @@
+import {SegmentedControl} from '@mantine/core';
 import {useMemo, useState} from 'react';
 import type {IconType} from "react-icons";
-import {SegmentedControl} from '@mantine/core';
-import {useLocation, useNavigate} from 'react-router';
 import {
     TbBurger,
     TbCarrot,
@@ -12,6 +11,7 @@ import {
     TbSalad,
     TbSoup
 } from "react-icons/tb";
+import {useLocation, useNavigate} from 'react-router';
 import {LabelWithIcon} from "./LabelWithIcon";
 
 const MEAL_ICONS = [
