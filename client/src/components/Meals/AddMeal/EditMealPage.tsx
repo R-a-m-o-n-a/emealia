@@ -22,6 +22,7 @@ export function EditMealPage() {
 
     const formRef = useRef<EditMealFormHandle>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     function navigateToDetails() {
         const cameFromDetails = location.state?.fromDetails;
@@ -46,7 +47,7 @@ export function EditMealPage() {
             <Navbar>
                 <BackButton onClickOverwrite={handleBackClick} />
                 Edit Meal
-                <DoneButton form="edit-meal-form" type="submit" />
+                <DoneButton isLoading={isSaving} form="edit-meal-form" type="submit" />
             </Navbar>
 
             <EditMealForm
@@ -54,6 +55,8 @@ export function EditMealPage() {
                 existingMeal={meal}
                 existingTags={tags}
                 existingCategoryName={location.state?.category?.name}
+                isSaving={isSaving}
+                setIsSaving={setIsSaving}
                 onSuccess={navigateToDetails}
                 formRef={formRef}
             />

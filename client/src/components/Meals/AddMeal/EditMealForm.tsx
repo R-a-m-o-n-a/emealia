@@ -1,7 +1,7 @@
 import type {Meal, Tag} from "@emealia/shared";
 import {Button, Group, Switch, Textarea, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
-import {type RefObject, useEffect, useImperativeHandle, useState} from "react";
+import {type Dispatch, type RefObject, type SetStateAction, useEffect, useImperativeHandle, useState} from "react";
 import "./EditMealForm.css";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import {addCategoryIfNew} from "../../../utils/data/helpers/addCategoryIfNew.ts";
@@ -24,6 +24,8 @@ interface EditMealFormProps {
     existingMeal?: Meal;
     existingTags?: Tag[];
     existingCategoryName?: string;
+    isSaving: boolean,
+    setIsSaving: Dispatch<SetStateAction<boolean>>,
     //todo existingImages
     onSuccess?: () => void;
     formRef?: RefObject<EditMealFormHandle | null>;
@@ -33,6 +35,8 @@ export function EditMealForm({
                                  existingMeal,
                                  existingTags,
                                  existingCategoryName,
+                                 isSaving,
+                                 setIsSaving,
                                  onSuccess,
                                  formRef,
                              }: EditMealFormProps) {
@@ -137,6 +141,7 @@ export function EditMealForm({
     const handleSubmit = async (values: typeof form.values) => {
         if (!userId) return;
 
+        setIsSaving(true);
         const upsertMealInput = {
             title: values.title,
             freeText: values.freeText,
@@ -156,16 +161,17 @@ export function EditMealForm({
             } else {
                 uploadedMealId = await addMeal(userId, upsertMealInput);
             }
-
+// todo make sure images can get uploaded before saving the meal, otherwise display error
             if (uploadedMealId && images.length > 0) {
                 await addMealImages(userId, uploadedMealId, images);
             }
 
             await syncEngine.runSync();
-
             onSuccess?.();
         } catch (error) {
             console.error("Failed to add meal:", error);
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -216,7 +222,7 @@ export function EditMealForm({
             <ImageDropzoneGrid images={images} setImages={setImages} />
 
             <Group justify="flex-end" mt="md">
-                <Button type="submit">{t("Save Meal")}</Button>
+                <Button loading={isSaving} type="submit">{t("Save Meal")}</Button>
             </Group>
         </form>
     );
