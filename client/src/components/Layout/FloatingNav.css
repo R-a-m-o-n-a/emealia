@@ -1,12 +1,19 @@
-.FloatingNav-element {
+.FloatingNav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     position: fixed;
+    pointer-events: none;
     bottom: calc(16px + env(safe-area-inset-bottom));
+    width: 100%;
+    padding: 0 calc(24px + env(safe-area-inset-right)) 0 calc(16px + env(safe-area-inset-left));
+    right: 0;
+    left: 0;
+    max-width: 1126px;
+    margin: auto;
 }
 
-.FloatingNav-left {
-    left: calc(16px + env(safe-area-inset-left));
-}
-
-.FloatingNav-right {
-    right: calc(24px + env(safe-area-inset-right));
+.FloatingNav * {
+    pointer-events: auto;
 }

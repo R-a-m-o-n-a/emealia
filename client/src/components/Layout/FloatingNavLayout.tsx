@@ -8,10 +8,8 @@ export function FloatingNavLayout() {
     return (
         <>
             <Outlet />
-            <nav className="FloatingNav-element FloatingNav-left">
+            <nav className="FloatingNav">
                 <FloatingTabs />
-            </nav>
-            <nav className="FloatingNav-element FloatingNav-right">
                 <AddButton />
             </nav>
         </>
