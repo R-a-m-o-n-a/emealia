@@ -22,9 +22,12 @@ export class SyncEngine {
     private isSyncing = false;
 
     async runSync(): Promise<void> {
-        console.log('Sync engine', this.isSyncing, navigator.onLine);
+        console.log('Sync engine running', {isSyncing: this.isSyncing, onLine: navigator.onLine});
+
         if (this.isSyncing || !navigator.onLine) return;
+
         this.isSyncing = true;
+
         const syncStartTime = new Date().toISOString();
 
         try {
@@ -63,9 +66,10 @@ export class SyncEngine {
             }))
         );
 
-        // Map camelCase to snake_case and exclude local sync fields
+        // Map camelCase to snake_case and exclude local-only sync fields (like syncStatus & localBlob)
         const payload = dirtyRecords.map((record) => {
-            const {syncStatus, ...rest} = record;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const {syncStatus, localBlob, ...rest} = record as T & { localBlob?: Blob };
             return toLowerSnakeCase({...rest, updatedAt: new Date().toISOString()});
         });
 
@@ -86,7 +90,6 @@ export class SyncEngine {
         await db.transaction('rw', table, async () => {
             for (const record of dirtyRecords) {
                 if (record.isDeleted) {
-                    // Hard-delete locally once Supabase acknowledges soft-delete
                     await table.delete(record.id);
                 } else {
                     await table.update(record.id, {syncStatus: 'synced'} as unknown as UpdateSpec<T>);

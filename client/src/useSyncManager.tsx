@@ -1,14 +1,20 @@
-import { useEffect } from 'react';
-import { syncEngine } from './utils/data/syncEngine.ts';
+import {useEffect} from 'react';
+import {syncEngine} from './utils/data/syncEngine.ts';
 
-export function useSyncManager() {
+export function useSyncManager(intervalMs = 30000) {
     useEffect(() => {
-        // Sync immediately on mount
         syncEngine.runSync();
+
+        const intervalId = window.setInterval(() => {
+            syncEngine.runSync();
+        }, intervalMs);
 
         const handleOnline = () => syncEngine.runSync();
         window.addEventListener('online', handleOnline);
 
-        return () => window.removeEventListener('online', handleOnline);
-    }, []);
+        return () => {
+            clearInterval(intervalId);
+            window.removeEventListener('online', handleOnline);
+        };
+    }, [intervalMs]);
 }
