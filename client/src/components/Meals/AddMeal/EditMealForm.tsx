@@ -1,7 +1,7 @@
 import type {Meal, Tag} from "@emealia/shared";
 import {Button, Group, Switch, Textarea, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
-import {useEffect, useState} from "react";
+import {type RefObject, useEffect, useImperativeHandle, useState} from "react";
 import "./EditMealForm.css";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import {addCategoryIfNew} from "../../../utils/data/helpers/addCategoryIfNew.ts";
@@ -13,14 +13,25 @@ import {t} from "../../../utils/translate.ts";
 import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithCreate.tsx";
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
 
+export interface EditMealFormHandle {
+    hasChanges: () => boolean;
+}
+
 interface EditMealFormProps {
     existingMeal?: Meal;
     existingTags?: Tag[];
     existingCategoryName?: string;
     onSuccess?: () => void;
+    formRef?: RefObject<EditMealFormHandle | null>;
 }
 
-export function EditMealForm({existingMeal, existingTags, existingCategoryName, onSuccess}: EditMealFormProps) {
+export function EditMealForm({
+                                 existingMeal,
+                                 existingTags,
+                                 existingCategoryName,
+                                 onSuccess,
+                                 formRef,
+                             }: EditMealFormProps) {
     const {userId} = useAuth();
     const tagsAndCategories = useTagsAndCategoriesByUser(userId);
 
@@ -29,8 +40,8 @@ export function EditMealForm({existingMeal, existingTags, existingCategoryName, 
     const tagNames = tags.map((tag) => tag.name);
     const categoryNames = categories.map((category) => category.name);
 
-    const [recipeLink, setRecipeLink] = useState<string>(existingMeal?.recipeLink ?? "");
-    const [videoLink, setVideoLink] = useState<string>(existingMeal?.videoLink ?? "");
+    const [recipeLink, /*setRecipeLink*/] = useState<string>(existingMeal?.recipeLink ?? "");
+    const [videoLink, /*setVideoLink*/] = useState<string>(existingMeal?.videoLink ?? "");
 
     const form = useForm({
         mode: "uncontrolled",
@@ -80,6 +91,30 @@ export function EditMealForm({existingMeal, existingTags, existingCategoryName, 
         form.setFieldValue("tagNames", existingTags.map((tag) => tag.name));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [existingTags]);
+
+    useImperativeHandle(formRef, () => ({
+        hasChanges: () => {
+            const currentValues = form.getValues();
+            console.log("currentValues", currentValues)
+            const originalCategoryName = tagsAndCategories?.categories.find(
+                (category) => category.id === existingMeal?.categoryId
+            )?.name ?? existingCategoryName ?? "";
+
+            const originalTagNames = (existingTags ?? []).map((tag) => tag.name).sort();
+            const currentTagNames = [...currentValues.tagNames].sort();
+
+            return (
+                currentValues.title !== (existingMeal?.title ?? "") ||
+                currentValues.categoryName !== originalCategoryName ||
+                currentValues.freeText !== (existingMeal?.freeText || "") ||
+                currentValues.isPrivate !== (existingMeal?.isPrivate || false) ||
+                currentValues.isToTry !== (existingMeal?.isToTry || false) ||
+                JSON.stringify(currentTagNames) !== JSON.stringify(originalTagNames) ||
+                recipeLink !== (existingMeal?.recipeLink ?? "") ||
+                videoLink !== (existingMeal?.videoLink ?? "")
+            );
+        }
+    }));
 
     const handleCreateCategory = async (name: string): Promise<string | null> => {
         if (!userId) return null;
