@@ -1,4 +1,4 @@
-import type {Meal, Tag} from "@emealia/shared";
+import type {Meal, MealImage, Tag} from "@emealia/shared";
 import {Button, Group, Switch, Textarea, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
 import {type Dispatch, type RefObject, type SetStateAction, useEffect, useImperativeHandle, useState} from "react";
@@ -14,21 +14,21 @@ import {syncEngine} from "../../../utils/data/syncEngine.ts";
 import {t} from "../../../utils/translate.ts";
 import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithCreate.tsx";
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
-import {ImageDropzoneGrid, type UploadedImage} from "./ImageDropzoneGrid/lmageDropzoneGrid.tsx";
+import {ImageDropzoneGrid, type UploadedImage} from "../MealImage/ImageDropzoneGrid/lmageDropzoneGrid.tsx";
 
 export interface EditMealFormHandle {
     hasChanges: () => boolean;
 }
 
 interface EditMealFormProps {
-    existingMeal?: Meal;
-    existingTags?: Tag[];
-    existingCategoryName?: string;
-    isSaving: boolean,
-    setIsSaving: Dispatch<SetStateAction<boolean>>,
-    //todo existingImages
+    existingMeal?: Meal
+    existingTags?: Tag[]
+    existingCategoryName?: string
+    existingImages?: MealImage[]
+    isSaving: boolean
+    setIsSaving: Dispatch<SetStateAction<boolean>>
     onSuccess?: () => void;
-    formRef?: RefObject<EditMealFormHandle | null>;
+    formRef?: RefObject<EditMealFormHandle | null>
 }
 
 export function EditMealForm({

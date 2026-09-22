@@ -3,6 +3,7 @@ import {Button, Group, Modal} from "@mantine/core";
 import {useRef, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router";
 import {useMeal} from "../../../utils/data/helpers/useMeal.ts";
+import {useMealImagesByMealId} from "../../../utils/data/helpers/useMealImagesByMealId.tsx";
 import {useTagsByMealId} from "../../../utils/data/helpers/useTagsByMealId.tsx";
 import {BackButton} from "../../Buttons/BackButton.tsx";
 import {DoneButton} from "../../Buttons/DoneButton.tsx";
@@ -16,9 +17,11 @@ export function EditMealPage() {
     const {id: mealId} = params;
     const mealFromDb = useMeal(mealId);
     const tagsFromDb = useTagsByMealId(mealId);
+    const mealImagesFromDb = useMealImagesByMealId(mealId);
 
     const meal = mealFromDb ?? location.state?.meal;
     const tags = tagsFromDb ?? location.state?.tags;
+    const mealImages = mealImagesFromDb ?? location.state?.mealImages;
 
     const formRef = useRef<EditMealFormHandle>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -55,6 +58,7 @@ export function EditMealPage() {
                 existingMeal={meal}
                 existingTags={tags}
                 existingCategoryName={location.state?.category?.name}
+                existingImages={mealImages}
                 isSaving={isSaving}
                 setIsSaving={setIsSaving}
                 onSuccess={navigateToDetails}

@@ -1,5 +1,5 @@
 import {db} from "../data/db.ts";
-import {getR2PresignedUrl} from "./getR2PresignedUrl.ts";
+import {getBatchR2PresignedUrls} from "./getR2PresignedUrl.ts";
 import {uploadMealImageToR2} from "./uploadMealImageToR2.ts";
 
 export async function processPendingImageUploads(userId: string) {
@@ -9,33 +9,46 @@ export async function processPendingImageUploads(userId: string) {
         .filter((img) => img.r2UploadStatus === 'pending' && !img.isDeleted && Boolean(img.localBlob))
         .toArray();
 
-    for (const imageRecord of pendingImages) {
-        if (!imageRecord.localBlob) continue;
+    if (pendingImages.length === 0) return;
 
-        try {
-            await db.mealImages.update(imageRecord.id, {r2UploadStatus: 'uploading'});
+    const pendingIds = pendingImages.map((img) => img.id);
+    await db.mealImages.where('id').anyOf(pendingIds).modify({r2UploadStatus: 'uploading'});
 
-            const data = await getR2PresignedUrl(
-                imageRecord.r2Path
-            );
+    try {
+        const payload = pendingImages.map((img) => ({
+            r2Path: img.r2Path,
+            contentType: img.localBlob?.type || 'image/webp',
+        }));
 
-            const {signedUrl, publicUrl} = data;
+        const urlMap = await getBatchR2PresignedUrls(payload);
 
-            const hasCloudflareUploadBeenSuccessful = await uploadMealImageToR2(signedUrl, imageRecord.localBlob);
+        const uploadPromises = pendingImages.map(async (imageRecord) => {
+            const {localBlob, r2Path, id} = imageRecord;
+            if (!localBlob) return;
 
-            if (hasCloudflareUploadBeenSuccessful) {
-                await db.mealImages.update(imageRecord.id, {
-                    r2UploadStatus: 'pending',
-                    publicUrl,
-                    localBlob: undefined, // Clears heavy byte storage from local IndexedDB
+            const presignedData = urlMap[r2Path];
+            if (!presignedData) {
+                await db.mealImages.update(id, {r2UploadStatus: 'error'});
+                return;
+            }
+
+            const isSuccess = await uploadMealImageToR2(presignedData.signedUrl, localBlob);
+
+            if (isSuccess) {
+                await db.mealImages.update(id, {
+                    r2UploadStatus: 'uploaded',
+                    publicUrl: presignedData.publicUrl,
+                    localBlob: undefined, // Clear Blob from Dexie
                     updatedAt: new Date().toISOString(),
                 });
             } else {
-                await db.mealImages.update(imageRecord.id, {r2UploadStatus: 'error'});
+                await db.mealImages.update(id, {r2UploadStatus: 'error'});
             }
-        } catch (error) {
-            console.error(`Failed to upload image ${imageRecord.id} to R2:`, error);
-            await db.mealImages.update(imageRecord.id, {r2UploadStatus: 'error'});
-        }
+        });
+
+        await Promise.allSettled(uploadPromises);
+    } catch (error) {
+        console.error('Failed batch upload to R2:', error);
+        await db.mealImages.where('id').anyOf(pendingIds).modify({r2UploadStatus: 'error'});
     }
 }

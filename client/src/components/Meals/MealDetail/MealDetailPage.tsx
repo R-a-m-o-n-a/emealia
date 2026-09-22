@@ -3,12 +3,14 @@ import {BiSolidHourglassTop} from "react-icons/bi";
 import {useLocation, useNavigate, useParams} from "react-router";
 import {useCategory} from "../../../utils/data/helpers/useCategory.ts";
 import {useMeal} from "../../../utils/data/helpers/useMeal.ts";
+import {useMealImagesByMealId} from "../../../utils/data/helpers/useMealImagesByMealId.tsx";
 import {useTagsByMealId} from "../../../utils/data/helpers/useTagsByMealId.tsx";
 import {BackButton} from "../../Buttons/BackButton.tsx";
 import {EditButton} from "../../Buttons/EditButton.tsx";
 import {Navbar} from "../../Navbar/Navbar.tsx";
 import {RecipeLink} from "../LinkButtons/RecipeLink.tsx";
 import {VideoLink} from "../LinkButtons/VideoLink.tsx";
+import {MealImageGrid} from "../MealImage/MealImageGrid.tsx";
 import {InfoIcon} from "./InfoIcon.tsx";
 import {MealDetailHeading} from "./MealDetailHeading.tsx";
 import {Tag} from "./Tag.tsx";
@@ -23,9 +25,12 @@ export function MealDetailPage() {
     const meal = useMeal(mealId);
     const category = useCategory(meal?.categoryId);
     const tags = useTagsByMealId(mealId);
+    const mealImages = useMealImagesByMealId(mealId);
+
+    console.log(mealImages)
 
     function navigateToEdit() {
-        navigate(`/meals/edit/${mealId}`, {state: {fromDetails: true, meal, tags, category}});
+        navigate(`/meals/edit/${mealId}`, {state: {fromDetails: true, meal, tags, category, mealImages}});
     }
 
     function navigateBackOrToMeals() {
@@ -59,6 +64,7 @@ export function MealDetailPage() {
                     <div className={"MealDetailPage-text"}>
                         {meal?.freeText}
                     </div>
+                    <MealImageGrid images={mealImages} />
                 </>
             )}
         </>
