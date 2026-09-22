@@ -1,12 +1,13 @@
 import type {BaseSyncEntity} from '@emealia/shared';
 import Dexie, {type UpdateSpec} from 'dexie';
+import {processPendingImageUploads} from "../images/processPendingImageUploads.ts";
+import {getUserId} from "../user/getUserId.tsx";
 import {toCamelCase, toLowerSnakeCase} from "./caseUtils.ts";
 import {db, EmealiaDB} from './db.ts';
 import {supabase} from './supabase.ts';
 
 const LAST_SYNC_KEY = 'emealia_last_synced_at';
 
-// Define sync order to respect Foreign Key constraints
 const SYNC_TABLES: Array<{ local: keyof EmealiaDB; remote: string }> = [
     {local: 'userSettings', remote: 'user_settings'},
     {local: 'categories', remote: 'categories'},
@@ -31,12 +32,17 @@ export class SyncEngine {
         const syncStartTime = new Date().toISOString();
 
         try {
-            // Push changes in order (parents -> children)
+            const userId = await getUserId();
+            // PHASE 1: Upload binary files (Blobs in localMealImages) to R2 first
+            // This uploads images to R2 and sets their publicUrl & r2Path on the local Dexie record
+            await processPendingImageUploads(userId);
+
+            // PHASE 2: Push database changes (parents -> children)
             for (const {local, remote} of SYNC_TABLES) {
                 await this.pushTable(local, remote);
             }
 
-            // Pull changes in order (parents -> children)
+            // PHASE 3: Pull remote database changes (parents -> children)
             for (const {local, remote} of SYNC_TABLES) {
                 await this.pullTable(local, remote);
             }
@@ -69,7 +75,10 @@ export class SyncEngine {
         // Map camelCase to snake_case and exclude local-only sync fields (like syncStatus & localBlob)
         const payload = dirtyRecords.map((record) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const {syncStatus, localBlob, ...rest} = record as T & { localBlob?: Blob };
+            const {syncStatus, localBlob, r2UploadStatus, ...rest} = record as T & {
+                localBlob?: Blob,
+                r2UploadStatus?: string
+            };
             return toLowerSnakeCase({...rest, updatedAt: new Date().toISOString()});
         });
 

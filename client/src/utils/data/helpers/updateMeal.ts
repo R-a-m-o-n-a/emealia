@@ -1,6 +1,5 @@
 import type {Meal, MealTagRelation} from "@emealia/shared";
 import {db} from "../db.ts";
-import {syncEngine} from "../syncEngine.ts";
 
 export interface UpsertMealInput {
     title: string;
@@ -75,7 +74,4 @@ export async function updateMeal(
         }
     }).catch(err => console.error("Updating meal transaction failed:", err));
 
-    syncEngine.runSync().catch(err => console.log(err)).then(() => {
-        console.log("Sync done");
-    });
 }

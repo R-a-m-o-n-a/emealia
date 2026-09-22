@@ -16,10 +16,17 @@ export interface Tag extends BaseSyncEntity {
 }
 
 export interface MealImage extends BaseSyncEntity {
-    mealId: string; // FK
-    cloudflareId: string;
+    mealId: string;         // FK
+    r2Path: string;         // Storage path inside R2 bucket
+    publicUrl?: string;     // Cached public CDN URL (optional)
     height: number;
     width: number;
+    sizeInBytes: number;      // Optional but recommended for storage tracking
+}
+
+export interface LocalMealImage extends MealImage {
+    localBlob?: Blob;     // Staged locally in Dexie for offline display before initial sync
+    r2UploadStatus: 'pending' | 'uploading' | 'uploaded' | 'error';
 }
 
 export interface MissingIngredient extends BaseSyncEntity {

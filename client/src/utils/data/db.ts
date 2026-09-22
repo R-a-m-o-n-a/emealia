@@ -1,7 +1,7 @@
 import type {
     Category,
+    LocalMealImage,
     Meal,
-    MealImage,
     MealTagRelation,
     MissingIngredient,
     Plan,
@@ -14,7 +14,7 @@ import Dexie from 'dexie';
 export class EmealiaDB extends Dexie {
     categories!: Table<Category>;
     tags!: Table<Tag>;
-    mealImages!: Table<MealImage>;
+    mealImages!: Table<LocalMealImage>;
     missingIngredients!: Table<MissingIngredient>;
     meals!: Table<Meal>;
     plans!: Table<Plan>;

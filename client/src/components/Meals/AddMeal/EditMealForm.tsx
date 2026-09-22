@@ -6,12 +6,15 @@ import "./EditMealForm.css";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import {addCategoryIfNew} from "../../../utils/data/helpers/addCategoryIfNew.ts";
 import {addMeal} from "../../../utils/data/helpers/addMeal.ts";
+import {addMealImages} from "../../../utils/data/helpers/addMealImages.ts";
 import {addTagIfNew} from "../../../utils/data/helpers/addTagIfNew.ts";
 import {updateMeal} from "../../../utils/data/helpers/updateMeal.ts";
 import {useTagsAndCategoriesByUser} from "../../../utils/data/helpers/useTagsAndCategoriesByUser.tsx";
+import {syncEngine} from "../../../utils/data/syncEngine.ts";
 import {t} from "../../../utils/translate.ts";
 import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithCreate.tsx";
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
+import {ImageDropzoneGrid, type UploadedImage} from "./ImageDropzoneGrid/lmageDropzoneGrid.tsx";
 
 export interface EditMealFormHandle {
     hasChanges: () => boolean;
@@ -21,6 +24,7 @@ interface EditMealFormProps {
     existingMeal?: Meal;
     existingTags?: Tag[];
     existingCategoryName?: string;
+    //todo existingImages
     onSuccess?: () => void;
     formRef?: RefObject<EditMealFormHandle | null>;
 }
@@ -40,6 +44,7 @@ export function EditMealForm({
     const tagNames = tags.map((tag) => tag.name);
     const categoryNames = categories.map((category) => category.name);
 
+    const [images, setImages] = useState<UploadedImage[]>([]); // todo fetch images
     const [recipeLink, /*setRecipeLink*/] = useState<string>(existingMeal?.recipeLink ?? "");
     const [videoLink, /*setVideoLink*/] = useState<string>(existingMeal?.videoLink ?? "");
 
@@ -111,7 +116,9 @@ export function EditMealForm({
                 currentValues.isToTry !== (existingMeal?.isToTry || false) ||
                 JSON.stringify(currentTagNames) !== JSON.stringify(originalTagNames) ||
                 recipeLink !== (existingMeal?.recipeLink ?? "") ||
-                videoLink !== (existingMeal?.videoLink ?? "")
+                videoLink !== (existingMeal?.videoLink ?? "") /*||
+                     todo image comparison images.length !== existingImages.length ||
+                    images.map(image => image.id)*/
             );
         }
     }));
@@ -142,11 +149,20 @@ export function EditMealForm({
         };
 
         try {
+            let uploadedMealId;
             if (existingMeal?.id) {
                 await updateMeal(userId, existingMeal.id, upsertMealInput);
+                uploadedMealId = existingMeal.id;
             } else {
-                await addMeal(userId, upsertMealInput);
+                uploadedMealId = await addMeal(userId, upsertMealInput);
             }
+
+            if (uploadedMealId && images.length > 0) {
+                await addMealImages(userId, uploadedMealId, images);
+            }
+
+            await syncEngine.runSync();
+
             onSuccess?.();
         } catch (error) {
             console.error("Failed to add meal:", error);
@@ -196,6 +212,8 @@ export function EditMealForm({
                 key={form.key("tagNames")}
                 {...form.getInputProps("tagNames")}
             />
+
+            <ImageDropzoneGrid images={images} setImages={setImages} />
 
             <Group justify="flex-end" mt="md">
                 <Button type="submit">{t("Save Meal")}</Button>
