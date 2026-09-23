@@ -70,7 +70,7 @@ export function MealDetailPage() {
                             <MealImageGridImage
                                 key={image.id}
                                 src={image.publicUrl}
-                                alt={`Meal Image ${index}`}
+                                alt={`Meal Image ${index + 1}`}
                             />
                         ))}
                     </MealImageGrid>

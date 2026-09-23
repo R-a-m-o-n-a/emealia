@@ -9,8 +9,8 @@ export function MealImageGridImage({src, alt}: MealImageProps) {
     return (
         <Image
             src={src}
-            w={120}
-            h={120}
+            w="120px"
+            h="120px"
             radius="md"
             fit="cover"
             alt={alt}

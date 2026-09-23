@@ -66,7 +66,7 @@ export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
                     <MealImageGridImage
                         key={image.id}
                         src={image.url}
-                        alt={`Meal image ${index}`}
+                        alt={`Meal image ${index + 1}`}
                     />
                     <DeleteXActionIcon onClick={() => {
                         handleRemove(image.id)
