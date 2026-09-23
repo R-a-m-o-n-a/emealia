@@ -1,18 +1,13 @@
-import type {MealImage} from '@emealia/shared';
 import {Box, useMantineTheme} from '@mantine/core';
 import {Dropzone, type FileWithPath, IMAGE_MIME_TYPE} from '@mantine/dropzone';
 import type {Dispatch, SetStateAction} from "react";
 import {TbPlus} from 'react-icons/tb';
-import {ImageKind} from "../../../../utils/enums/ImageKind.tsx";
 import {compressImage} from '../../../../utils/images/imageCompressor.ts';
 import './ImageDropzoneGrid.css';
 import {MealImageGrid} from "../MealImageGrid/MealImageGrid.tsx";
 import {MealImageGridImage} from "../MealImageGrid/MealImageGridImage.tsx";
+import {ImageKind, type UnifiedImage} from "../UnifiedImage.tsx";
 import {DeleteXActionIcon} from "./DeleteXActionIcon.tsx";
-
-export type UnifiedImage =
-    | { kind: ImageKind.existing; id: string; url: string; raw: MealImage }
-    | { kind: ImageKind.new; id: string; url: string; blob: Blob };
 
 interface ImageDropzoneGridProps {
     images: UnifiedImage[];

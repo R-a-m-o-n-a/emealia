@@ -12,11 +12,11 @@ import {removeMealImages} from "../../../utils/data/helpers/removeMealImages.ts"
 import {updateMeal} from "../../../utils/data/helpers/updateMeal.ts";
 import {useTagsAndCategoriesByUser} from "../../../utils/data/helpers/useTagsAndCategoriesByUser.tsx";
 import {syncEngine} from "../../../utils/data/syncEngine.ts";
-import {ImageKind} from "../../../utils/enums/ImageKind.tsx";
 import {t} from "../../../utils/translate.ts";
 import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithCreate.tsx";
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
-import {ImageDropzoneGrid, type UnifiedImage} from "../MealImage/ImageDropzoneGrid/lmageDropzoneGrid.tsx";
+import {ImageDropzoneGrid} from "../MealImage/ImageDropzoneGrid/ImageDropzoneGrid.tsx";
+import {ImageKind, isExistingImage, isNewImage, type UnifiedImage} from "../MealImage/UnifiedImage.tsx";
 
 const mapMealImagesToUnifiedImages = (dbImages?: MealImage[]): UnifiedImage[] => {
     if (!dbImages) return [];
@@ -193,9 +193,7 @@ export function EditMealForm({
             if (uploadedMealId) {
                 const currentImageIds = new Set(
                     images
-                        .filter((img): img is Extract<UnifiedImage, {
-                            kind: ImageKind.existing
-                        }> => img.kind === ImageKind.existing)
+                        .filter(isExistingImage)
                         .map((img) => img.id)
                 );
                 const removedImageIds = (existingImages ?? [])
@@ -206,9 +204,7 @@ export function EditMealForm({
                     await removeMealImages(userId, uploadedMealId, removedImageIds);
                 }
 
-                const newUploads = images.filter(
-                    (img): img is Extract<UnifiedImage, { kind: "new" }> => img.kind === "new"
-                );
+                const newUploads = images.filter(isNewImage);
 
                 if (newUploads.length > 0) {
                     await addMealImages(userId, uploadedMealId, newUploads);
