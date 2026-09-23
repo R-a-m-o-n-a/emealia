@@ -10,7 +10,8 @@ import {EditButton} from "../../Buttons/EditButton.tsx";
 import {Navbar} from "../../Navbar/Navbar.tsx";
 import {RecipeLink} from "../LinkButtons/RecipeLink.tsx";
 import {VideoLink} from "../LinkButtons/VideoLink.tsx";
-import {MealImageGrid} from "../MealImage/MealImageGrid.tsx";
+import {MealImageGrid} from "../MealImage/MealImageGrid/MealImageGrid.tsx";
+import {MealImageGridImage} from "../MealImage/MealImageGrid/MealImageGridImage.tsx";
 import {InfoIcon} from "./InfoIcon.tsx";
 import {MealDetailHeading} from "./MealDetailHeading.tsx";
 import {Tag} from "./Tag.tsx";
@@ -64,7 +65,15 @@ export function MealDetailPage() {
                     <div className={"MealDetailPage-text"}>
                         {meal?.freeText}
                     </div>
-                    <MealImageGrid images={mealImages} />
+                    <MealImageGrid>
+                        {mealImages?.map((image, index) => (
+                            <MealImageGridImage
+                                key={image.id}
+                                src={image.publicUrl}
+                                alt={`Meal Image ${index}`}
+                            />
+                        ))}
+                    </MealImageGrid>
                 </>
             )}
         </>

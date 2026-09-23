@@ -1,11 +1,13 @@
 import type {MealImage} from '@emealia/shared';
-import {Box, Group, Image, useMantineTheme} from '@mantine/core';
+import {Box, useMantineTheme} from '@mantine/core';
 import {Dropzone, type FileWithPath, IMAGE_MIME_TYPE} from '@mantine/dropzone';
 import type {Dispatch, SetStateAction} from "react";
 import {TbPlus} from 'react-icons/tb';
 import {ImageKind} from "../../../../utils/enums/ImageKind.tsx";
 import {compressImage} from '../../../../utils/images/imageCompressor.ts';
 import './ImageDropzoneGrid.css';
+import {MealImageGrid} from "../MealImageGrid/MealImageGrid.tsx";
+import {MealImageGridImage} from "../MealImageGrid/MealImageGridImage.tsx";
 import {DeleteXActionIcon} from "./DeleteXActionIcon.tsx";
 
 export type UnifiedImage =
@@ -52,7 +54,7 @@ export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
     };
 
     return (
-        <Group align="flex-start" gap="md">
+        <MealImageGrid>
             <Dropzone
                 onDrop={handleDrop}
                 accept={IMAGE_MIME_TYPE}
@@ -64,21 +66,19 @@ export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
                 <TbPlus size={36} color={theme.colors.lime[6]} />
             </Dropzone>
 
-            {images.map((img) => (
-                <Box key={img.id} className="ImageDropzoneGrid-previewBox">
-                    <Image
-                        src={img.url}
-                        w={120}
-                        h={120}
-                        fit="cover"
-                        alt="Meal preview"
+            {images.map((image, index) => (
+                <Box key={image.id} pos="relative">
+                    <MealImageGridImage
+                        key={image.id}
+                        src={image.url}
+                        alt={`Meal image ${index}`}
                     />
                     <DeleteXActionIcon onClick={() => {
-                        handleRemove(img.id)
+                        handleRemove(image.id)
                     }}
                     />
                 </Box>
             ))}
-        </Group>
+        </MealImageGrid>
     );
 }
