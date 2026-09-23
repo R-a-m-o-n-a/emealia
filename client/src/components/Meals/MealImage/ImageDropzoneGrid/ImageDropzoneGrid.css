@@ -25,9 +25,3 @@
     border-radius: var(--mantine-radius-md);
     overflow: hidden;
 }
-
-.ImageDropzoneGrid-removeButton {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-}

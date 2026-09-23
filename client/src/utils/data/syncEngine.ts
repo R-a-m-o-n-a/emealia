@@ -34,7 +34,7 @@ export class SyncEngine {
 
         try {
             const userId = await getUserId();
-            
+
             // PHASE 1: Manage image files in R2
             await processPendingImageDeletions(userId);
             await processPendingImageUploads(userId);
@@ -77,9 +77,10 @@ export class SyncEngine {
         // Map camelCase to snake_case and exclude local-only sync fields (like syncStatus & localBlob)
         const payload = dirtyRecords.map((record) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const {syncStatus, localBlob, r2UploadStatus, ...rest} = record as T & {
+            const {syncStatus, localBlob, r2UploadStatus, r2DeletionStatus, ...rest} = record as T & {
                 localBlob?: Blob,
-                r2UploadStatus?: string
+                r2UploadStatus?: string,
+                r2DeletionStatus?: string,
             };
             return toLowerSnakeCase({...rest, updatedAt: new Date().toISOString()});
         });

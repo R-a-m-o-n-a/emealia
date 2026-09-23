@@ -1,11 +1,12 @@
 import type {MealImage} from '@emealia/shared';
-import {ActionIcon, Box, Group, Image, useMantineTheme} from '@mantine/core';
+import {Box, Group, Image, useMantineTheme} from '@mantine/core';
 import {Dropzone, type FileWithPath, IMAGE_MIME_TYPE} from '@mantine/dropzone';
 import type {Dispatch, SetStateAction} from "react";
-import {TbPlus, TbX} from 'react-icons/tb';
+import {TbPlus} from 'react-icons/tb';
 import {ImageKind} from "../../../../utils/enums/ImageKind.tsx";
 import {compressImage} from '../../../../utils/images/imageCompressor.ts';
 import './ImageDropzoneGrid.css';
+import {DeleteXActionIcon} from "./DeleteXActionIcon.tsx";
 
 export type UnifiedImage =
     | { kind: ImageKind.existing; id: string; url: string; raw: MealImage }
@@ -70,19 +71,12 @@ export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
                         w={120}
                         h={120}
                         fit="cover"
-                        radius="md"
                         alt="Meal preview"
                     />
-                    <ActionIcon
-                        variant="filled"
-                        color="red"
-                        size="xs"
-                        radius="xl"
-                        className="ImageDropzoneGrid-removeButton"
-                        onClick={() => handleRemove(img.id)}
-                    >
-                        <TbX size={12} />
-                    </ActionIcon>
+                    <DeleteXActionIcon onClick={() => {
+                        handleRemove(img.id)
+                    }}
+                    />
                 </Box>
             ))}
         </Group>
