@@ -3,6 +3,7 @@ import {db} from "../db"; // import your Dexie db instance
 
 export interface UploadedImageItem {
     id: string;
+    url: string;
     blob: Blob;
 }
 
@@ -23,15 +24,25 @@ export async function addMealImages(
                 mealId,
                 r2Path: `${userId}/meals/${mealId}/${img.id}.webp`,
                 r2UploadStatus: "pending",
-                localBlob: img.blob,
-                height: dimensions.height,
-                width: dimensions.width,
-                sizeInBytes: img.blob.size,
-                syncStatus: "pending",
-                isDeleted: false,
-                createdAt: now,
-                updatedAt: now,
-            };
+                publicUrl: img.url, // will be replaced with publicUrl once edge function returns it
+                localBlob:
+                img.blob,
+                height:
+                dimensions.height,
+                width:
+                dimensions.width,
+                sizeInBytes:
+                img.blob.size,
+                syncStatus:
+                    "pending",
+                isDeleted:
+                    false,
+                createdAt:
+                now,
+                updatedAt:
+                now,
+            }
+                ;
         })
     );
 

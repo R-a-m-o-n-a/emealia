@@ -1,26 +1,26 @@
+import type {MealImage} from '@emealia/shared';
 import {ActionIcon, Box, Group, Image, useMantineTheme} from '@mantine/core';
 import {Dropzone, type FileWithPath, IMAGE_MIME_TYPE} from '@mantine/dropzone';
 import type {Dispatch, SetStateAction} from "react";
 import {TbPlus, TbX} from 'react-icons/tb';
+import {ImageKind} from "../../../../utils/enums/ImageKind.tsx";
 import {compressImage} from '../../../../utils/images/imageCompressor.ts';
 import './ImageDropzoneGrid.css';
 
-export interface UploadedImage {
-    id: string;
-    url: string;
-    blob: Blob;
-}
+export type UnifiedImage =
+    | { kind: ImageKind.existing; id: string; url: string; raw: MealImage }
+    | { kind: ImageKind.new; id: string; url: string; blob: Blob };
 
 interface ImageDropzoneGridProps {
-    images: UploadedImage[];
-    setImages: Dispatch<SetStateAction<UploadedImage[]>>;
+    images: UnifiedImage[];
+    setImages: Dispatch<SetStateAction<UnifiedImage[]>>;
 }
 
 export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
     const theme = useMantineTheme();
 
     const handleDrop = async (files: FileWithPath[]) => {
-        const processedImages = await Promise.all(
+        const processedImages: UnifiedImage[] = await Promise.all(
             files.map(async (file) => {
                 let compressedResult: Blob = file;
                 try {
@@ -29,6 +29,7 @@ export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
                     console.error('Image compression failed:', error);
                 }
                 return {
+                    kind: ImageKind.new,
                     id: crypto.randomUUID(),
                     url: URL.createObjectURL(compressedResult),
                     blob: compressedResult,
@@ -41,12 +42,11 @@ export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
 
     const handleRemove = (id: string) => {
         setImages((prev) => {
-            const filtered = prev.filter((item) => item.id !== id);
             const removed = prev.find((item) => item.id === id);
-            if (removed) {
+            if (removed && removed.kind === "new") {
                 URL.revokeObjectURL(removed.url);
             }
-            return filtered;
+            return prev.filter((item) => item.id !== id);
         });
     };
 
@@ -60,7 +60,7 @@ export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
                     inner: "ImageDropzoneGrid-dropzoneInner",
                 }}
             >
-                <TbPlus size={36} color={theme.colors.lime[6]} /> {/*todo color*/}
+                <TbPlus size={36} color={theme.colors.lime[6]} />
             </Dropzone>
 
             {images.map((img) => (
@@ -71,7 +71,7 @@ export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
                         h={120}
                         fit="cover"
                         radius="md"
-                        alt="Uploaded preview"
+                        alt="Meal preview"
                     />
                     <ActionIcon
                         variant="filled"

@@ -8,13 +8,25 @@ import {addCategoryIfNew} from "../../../utils/data/helpers/addCategoryIfNew.ts"
 import {addMeal} from "../../../utils/data/helpers/addMeal.ts";
 import {addMealImages} from "../../../utils/data/helpers/addMealImages.ts";
 import {addTagIfNew} from "../../../utils/data/helpers/addTagIfNew.ts";
+import {removeMealImages} from "../../../utils/data/helpers/removeMealImages.ts";
 import {updateMeal} from "../../../utils/data/helpers/updateMeal.ts";
 import {useTagsAndCategoriesByUser} from "../../../utils/data/helpers/useTagsAndCategoriesByUser.tsx";
 import {syncEngine} from "../../../utils/data/syncEngine.ts";
+import {ImageKind} from "../../../utils/enums/ImageKind.tsx";
 import {t} from "../../../utils/translate.ts";
 import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithCreate.tsx";
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
-import {ImageDropzoneGrid, type UploadedImage} from "../MealImage/ImageDropzoneGrid/lmageDropzoneGrid.tsx";
+import {ImageDropzoneGrid, type UnifiedImage} from "../MealImage/ImageDropzoneGrid/lmageDropzoneGrid.tsx";
+
+const mapMealImagesToUnifiedImages = (dbImages?: MealImage[]): UnifiedImage[] => {
+    if (!dbImages) return [];
+    return dbImages.map((img) => ({
+        kind: ImageKind.existing,
+        id: img.id,
+        url: img.publicUrl,
+        raw: img,
+    }));
+};
 
 export interface EditMealFormHandle {
     hasChanges: () => boolean;
@@ -35,6 +47,7 @@ export function EditMealForm({
                                  existingMeal,
                                  existingTags,
                                  existingCategoryName,
+                                 existingImages,
                                  isSaving,
                                  setIsSaving,
                                  onSuccess,
@@ -48,9 +61,14 @@ export function EditMealForm({
     const tagNames = tags.map((tag) => tag.name);
     const categoryNames = categories.map((category) => category.name);
 
-    const [images, setImages] = useState<UploadedImage[]>([]); // todo fetch images
-    const [recipeLink, /*setRecipeLink*/] = useState<string>(existingMeal?.recipeLink ?? "");
-    const [videoLink, /*setVideoLink*/] = useState<string>(existingMeal?.videoLink ?? "");
+    const [images, setImages] = useState<UnifiedImage[]>(() => mapMealImagesToUnifiedImages(existingImages));
+    const [recipeLink] = useState<string>(existingMeal?.recipeLink ?? "");
+    const [videoLink] = useState<string>(existingMeal?.videoLink ?? "");
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setImages(() => mapMealImagesToUnifiedImages(existingImages));
+    }, [existingImages]);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -104,13 +122,24 @@ export function EditMealForm({
     useImperativeHandle(formRef, () => ({
         hasChanges: () => {
             const currentValues = form.getValues();
-            console.log("currentValues", currentValues)
+
             const originalCategoryName = tagsAndCategories?.categories.find(
                 (category) => category.id === existingMeal?.categoryId
             )?.name ?? existingCategoryName ?? "";
 
             const originalTagNames = (existingTags ?? []).map((tag) => tag.name).sort();
             const currentTagNames = [...currentValues.tagNames].sort();
+
+            const initialImageIds = (existingImages ?? []).map((img) => img.id).sort();
+            const currentExistingImageIds = images
+                .filter((img): img is Extract<UnifiedImage, { kind: "existing" }> => img.kind === "existing")
+                .map((img) => img.id)
+                .sort();
+
+            const hasNewImages = images.some((img) => img.kind === "new");
+            const hasImageChanges =
+                hasNewImages ||
+                JSON.stringify(initialImageIds) !== JSON.stringify(currentExistingImageIds);
 
             return (
                 currentValues.title !== (existingMeal?.title ?? "") ||
@@ -120,9 +149,8 @@ export function EditMealForm({
                 currentValues.isToTry !== (existingMeal?.isToTry || false) ||
                 JSON.stringify(currentTagNames) !== JSON.stringify(originalTagNames) ||
                 recipeLink !== (existingMeal?.recipeLink ?? "") ||
-                videoLink !== (existingMeal?.videoLink ?? "") /*||
-                     todo image comparison images.length !== existingImages.length ||
-                    images.map(image => image.id)*/
+                videoLink !== (existingMeal?.videoLink ?? "") ||
+                hasImageChanges
             );
         }
     }));
@@ -154,16 +182,37 @@ export function EditMealForm({
         };
 
         try {
-            let uploadedMealId;
+            let uploadedMealId: string | null;
             if (existingMeal?.id) {
                 await updateMeal(userId, existingMeal.id, upsertMealInput);
                 uploadedMealId = existingMeal.id;
             } else {
                 uploadedMealId = await addMeal(userId, upsertMealInput);
             }
-// todo make sure images can get uploaded before saving the meal, otherwise display error
-            if (uploadedMealId && images.length > 0) {
-                await addMealImages(userId, uploadedMealId, images);
+
+            if (uploadedMealId) {
+                const currentImageIds = new Set(
+                    images
+                        .filter((img): img is Extract<UnifiedImage, {
+                            kind: ImageKind.existing
+                        }> => img.kind === ImageKind.existing)
+                        .map((img) => img.id)
+                );
+                const removedImageIds = (existingImages ?? [])
+                    .filter((img) => !currentImageIds.has(img.id))
+                    .map((img) => img.id);
+
+                if (removedImageIds.length > 0) {
+                    await removeMealImages(userId, uploadedMealId, removedImageIds);
+                }
+
+                const newUploads = images.filter(
+                    (img): img is Extract<UnifiedImage, { kind: "new" }> => img.kind === "new"
+                );
+
+                if (newUploads.length > 0) {
+                    await addMealImages(userId, uploadedMealId, newUploads);
+                }
             }
 
             await syncEngine.runSync();

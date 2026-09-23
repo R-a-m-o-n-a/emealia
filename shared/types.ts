@@ -18,7 +18,7 @@ export interface Tag extends BaseSyncEntity {
 export interface MealImage extends BaseSyncEntity {
     mealId: string;         // FK
     r2Path: string;         // Storage path inside R2 bucket
-    publicUrl?: string;     // Cached public CDN URL (optional)
+    publicUrl: string;
     height: number;
     width: number;
     sizeInBytes: number;      // Optional but recommended for storage tracking
@@ -27,6 +27,7 @@ export interface MealImage extends BaseSyncEntity {
 export interface LocalMealImage extends MealImage {
     localBlob?: Blob;     // Staged locally in Dexie for offline display before initial sync
     r2UploadStatus: 'pending' | 'uploading' | 'uploaded' | 'error';
+    r2DeletionStatus: 'not_deleted' | 'pending' | 'deleting' | 'deleted' | 'error';
 }
 
 export interface MissingIngredient extends BaseSyncEntity {

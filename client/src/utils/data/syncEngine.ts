@@ -1,5 +1,6 @@
 import type {BaseSyncEntity} from '@emealia/shared';
 import Dexie, {type UpdateSpec} from 'dexie';
+import {processPendingImageDeletions} from "../images/processPendingImageDeletions.ts";
 import {processPendingImageUploads} from "../images/processPendingImageUploads.ts";
 import {getUserId} from "../user/getUserId.tsx";
 import {toCamelCase, toLowerSnakeCase} from "./caseUtils.ts";
@@ -33,8 +34,9 @@ export class SyncEngine {
 
         try {
             const userId = await getUserId();
-            // PHASE 1: Upload binary files (Blobs in localMealImages) to R2 first
-            // This uploads images to R2 and sets their publicUrl & r2Path on the local Dexie record
+            
+            // PHASE 1: Manage image files in R2
+            await processPendingImageDeletions(userId);
             await processPendingImageUploads(userId);
 
             // PHASE 2: Push database changes (parents -> children)
