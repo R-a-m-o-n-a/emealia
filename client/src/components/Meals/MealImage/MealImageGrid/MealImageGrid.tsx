@@ -6,6 +6,9 @@ interface MealImageGridProps {
     children: ReactNode
 }
 
+export const gridImageHeight = "120px";
+export const gridImageWidth = gridImageHeight;
+
 export function MealImageGrid({children}: MealImageGridProps) {
 
     return (

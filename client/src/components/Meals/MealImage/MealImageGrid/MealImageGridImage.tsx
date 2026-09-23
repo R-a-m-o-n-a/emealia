@@ -1,4 +1,5 @@
 import {Image} from "@mantine/core";
+import {gridImageHeight, gridImageWidth} from "./MealImageGrid.tsx";
 
 interface MealImageProps {
     src: string,
@@ -9,8 +10,8 @@ export function MealImageGridImage({src, alt}: MealImageProps) {
     return (
         <Image
             src={src}
-            w="120px"
-            h="120px"
+            h={gridImageHeight}
+            w={gridImageWidth}
             radius="md"
             fit="cover"
             alt={alt}
