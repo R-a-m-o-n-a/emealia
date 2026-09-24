@@ -18,12 +18,13 @@ import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
 import {ImageDropzoneGrid} from "../MealImage/ImageDropzoneGrid/ImageDropzoneGrid.tsx";
 import {ImageKind, isExistingImage, isNewImage, type UnifiedImage} from "../MealImage/UnifiedImage.tsx";
 
-const mapMealImagesToUnifiedImages = (dbImages?: MealImage[]): UnifiedImage[] => {
+const mapMealImagesToUnifiedImages = (dbImages?: MealImage[], mainImageId?: string): UnifiedImage[] => {
     if (!dbImages) return [];
     return dbImages.map((img) => ({
         kind: ImageKind.existing,
         id: img.id,
         url: img.publicUrl,
+        isMain: img.id === mainImageId,
         raw: img,
     }));
 };
@@ -55,20 +56,20 @@ export function EditMealForm({
                              }: EditMealFormProps) {
     const {userId} = useAuth();
     const tagsAndCategories = useTagsAndCategoriesByUser(userId);
-
+    console.log('mainImgId', existingMeal?.mainImageId)
     const tags = tagsAndCategories?.tags ?? [];
     const categories = tagsAndCategories?.categories ?? [];
     const tagNames = tags.map((tag) => tag.name);
     const categoryNames = categories.map((category) => category.name);
 
-    const [images, setImages] = useState<UnifiedImage[]>(() => mapMealImagesToUnifiedImages(existingImages));
+    const [images, setImages] = useState<UnifiedImage[]>(() => mapMealImagesToUnifiedImages(existingImages, existingMeal?.mainImageId));
     const [recipeLink] = useState<string>(existingMeal?.recipeLink ?? "");
     const [videoLink] = useState<string>(existingMeal?.videoLink ?? "");
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setImages(() => mapMealImagesToUnifiedImages(existingImages));
-    }, [existingImages]);
+        setImages(() => mapMealImagesToUnifiedImages(existingImages, existingMeal?.mainImageId));
+    }, [existingImages, existingMeal?.mainImageId]);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -179,6 +180,7 @@ export function EditMealForm({
             tagIds: tagsAndCategories?.tags.filter((tag) => values.tagNames.includes(tag.name)).map((tag) => tag.id),
             recipeLink,
             videoLink,
+            mainImageId: images.find(img => img.isMain)?.id,
         };
 
         try {

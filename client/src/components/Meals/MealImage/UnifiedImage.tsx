@@ -7,8 +7,20 @@ export const ImageKind = {
 
 export type ImageKind = typeof ImageKind[keyof typeof ImageKind];
 
-export type ExistingImage = { kind: typeof ImageKind.existing; id: string; url: string; raw: MealImage };
-export type NewImage = { kind: typeof ImageKind.new; id: string; url: string; blob: Blob };
+export type ExistingImage = {
+    kind: typeof ImageKind.existing;
+    id: string;
+    url: string;
+    isMain: boolean;
+    raw: MealImage
+};
+export type NewImage = {
+    kind: typeof ImageKind.new;
+    id: string;
+    url: string;
+    isMain: boolean;
+    blob: Blob
+};
 
 export type UnifiedImage = ExistingImage | NewImage;
 

@@ -7,19 +7,20 @@ export async function addMeal(userId: string, input: UpsertMealInput): Promise<s
     const now = new Date().toISOString();
 
     const newMeal: Meal = {
+        categoryId: input.categoryId || undefined,
+        createdAt: now,
+        freeText: input.freeText?.trim() || undefined,
         id: mealId,
         isDeleted: false,
-        syncStatus: "pending",
-        userId,
-        title: input.title.trim(),
-        categoryId: input.categoryId || undefined,
-        freeText: input.freeText?.trim() || undefined,
         isPrivate: input.isPrivate ?? false,
         isToTry: input.isToTry ?? false,
+        mainImageId: input.mainImageId || undefined,
         recipeLink: input.recipeLink?.trim() || undefined,
+        syncStatus: "pending",
+        title: input.title.trim(),
+        updatedAt: now,
+        userId,
         videoLink: input.videoLink?.trim() || undefined,
-        createdAt: now,
-        updatedAt: now
     };
 
     const tagIds = input.tagIds ?? [];

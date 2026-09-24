@@ -12,7 +12,7 @@ export const gridImageWidth = gridImageHeight;
 export function MealImageGrid({children}: MealImageGridProps) {
 
     return (
-        <Group align="flex-start" gap="md" className={"MealImageGrid"}>
+        <Group align="flex-start" gap="sm" className={"MealImageGrid"}>
             {children}
         </Group>
     );

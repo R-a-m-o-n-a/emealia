@@ -28,8 +28,6 @@ export function MealDetailPage() {
     const tags = useTagsByMealId(mealId);
     const mealImages = useMealImagesByMealId(mealId);
 
-    console.log(mealImages)
-
     function navigateToEdit() {
         navigate(`/meals/edit/${mealId}`, {state: {fromDetails: true, meal, tags, category, mealImages}});
     }

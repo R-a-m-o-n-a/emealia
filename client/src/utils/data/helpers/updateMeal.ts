@@ -11,6 +11,7 @@ export interface UpsertMealInput {
     tagIds?: string[];
     recipeLink?: string;
     videoLink?: string;
+    mainImageId?: string;
 }
 
 export async function updateMeal(
@@ -32,6 +33,7 @@ export async function updateMeal(
     if (input.isToTry !== undefined) mealUpdates.isToTry = input.isToTry;
     if (input.recipeLink !== undefined) mealUpdates.recipeLink = input.recipeLink?.trim() || undefined;
     if (input.videoLink !== undefined) mealUpdates.videoLink = input.videoLink?.trim() || undefined;
+    if (input.mainImageId !== undefined) mealUpdates.mainImageId = input.mainImageId?.trim() || undefined;
 
     await db.transaction("rw", [db.meals, db.tags, db.mealTagRelations], async () => {
         await db.meals.update(mealId, mealUpdates);
