@@ -4,7 +4,7 @@ import {gridImageHeight, gridImageWidth} from "./MealImageGrid.tsx";
 interface MealImageProps {
     src: string;
     alt: string;
-    isMain: boolean;
+    isMain?: boolean;
 }
 
 export function MealImageGridImage({src, alt, isMain}: MealImageProps) {

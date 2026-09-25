@@ -7,6 +7,7 @@ import {compressImage} from "../../../../utils/images/imageCompressor.ts";
 
 import {MealImageGrid} from '../MealImageGrid/MealImageGrid.tsx';
 import {ImageKind, type UnifiedImage} from "../UnifiedImage.tsx";
+import {ImageDragDropProvider} from "./ImageDragDropProvider.tsx";
 import {ImageDropzone} from './ImageDropzone/ImageDropzone.tsx';
 import {SortableMealImage} from './SortableMealImage.tsx';
 
@@ -109,7 +110,7 @@ export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
     };
 
     return (
-        <DragDropProvider
+        <ImageDragDropProvider
             sensors={(defaultSensors) => [
                 ...defaultSensors.filter((sensor) => sensor !== PointerSensor),
                 PointerSensor.configure({
@@ -147,6 +148,6 @@ export function ImageDropzoneGrid({images, setImages}: ImageDropzoneGridProps) {
                     />
                 ))}
             </MealImageGrid>
-        </DragDropProvider>
+        </ImageDragDropProvider>
     );
 }
