@@ -2,8 +2,7 @@ import type {Meal, MealTagRelation} from "@emealia/shared";
 import {db} from "../db";
 import type {UpsertMealInput} from "./updateMeal.ts";
 
-export async function addMeal(userId: string, input: UpsertMealInput): Promise<string> {
-    const mealId = crypto.randomUUID();
+export async function addMeal(userId: string, mealId: string, input: UpsertMealInput): Promise<string> {
     const now = new Date().toISOString();
 
     const newMeal: Meal = {
@@ -14,7 +13,6 @@ export async function addMeal(userId: string, input: UpsertMealInput): Promise<s
         isDeleted: false,
         isPrivate: input.isPrivate ?? false,
         isToTry: input.isToTry ?? false,
-        mainImageId: input.mainImageId || undefined,
         recipeLink: input.recipeLink?.trim() || undefined,
         syncStatus: "pending",
         title: input.title.trim(),

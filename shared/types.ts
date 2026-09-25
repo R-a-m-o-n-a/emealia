@@ -21,7 +21,9 @@ export interface MealImage extends BaseSyncEntity {
     publicUrl: string;
     height: number;
     width: number;
-    sizeInBytes: number;      // Optional but recommended for storage tracking
+    sizeInBytes: number;    // Optional but recommended for storage tracking
+    position: number;       // integer describing sorting order
+    isMain: boolean;
 }
 
 export interface LocalMealImage extends MealImage {
@@ -45,7 +47,6 @@ export interface Meal extends BaseSyncEntity {
     categoryId?: string; // Foreign key to Category
     isToTry?: boolean;
     isPrivate?: boolean;
-    mainImageId?: string;
 }
 
 export interface Plan extends BaseSyncEntity {

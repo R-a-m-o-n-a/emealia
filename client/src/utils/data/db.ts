@@ -33,7 +33,7 @@ export class EmealiaDB extends Dexie {
             meals: '&id, userId, categoryId, syncStatus, updatedAt',
             plans: '&id, userId, connectedMealId, date, syncStatus, updatedAt',
             userSettings: '&id, userId, syncStatus, updatedAt',
-            mealTagRelations: '&id, userId, mealId, tagId, [mealId+tagId], syncStatus, updatedAt'
+            mealTagRelations: '&id, userId, [mealId+userId], mealId, tagId, [mealId+tagId], syncStatus, updatedAt'
         });
     }
 }

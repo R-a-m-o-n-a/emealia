@@ -1,10 +1,12 @@
 import type {LocalMealImage} from "@emealia/shared";
-import {db} from "../db"; // import your Dexie db instance
+import {db} from "../db";
 
 export interface UploadedImageItem {
     id: string;
     url: string;
     blob: Blob;
+    position: number;
+    isMain: boolean;
 }
 
 export async function addMealImages(
@@ -19,21 +21,23 @@ export async function addMealImages(
             const dimensions = await getImageDimensions(img.blob);
 
             return {
-                id: crypto.randomUUID(),
-                userId,
+                createdAt: now,
+                height: dimensions.height,
+                id: img.id,
+                isDeleted: false,
+                isMain: img.isMain,
+                localBlob: img.blob,
                 mealId,
+                position: img.position,
+                publicUrl: img.url,
+                r2DeletionStatus: "not_deleted",
                 r2Path: `${userId}/meals/${mealId}/${img.id}.webp`,
                 r2UploadStatus: "pending",
-                r2DeletionStatus: "not_deleted",
-                publicUrl: img.url, // will be replaced with publicUrl once edge function returns it
-                localBlob: img.blob,
-                height: dimensions.height,
-                width: dimensions.width,
                 sizeInBytes: img.blob.size,
                 syncStatus: "pending",
-                isDeleted: false,
-                createdAt: now,
                 updatedAt: now,
+                userId,
+                width: dimensions.width,
             };
         })
     );

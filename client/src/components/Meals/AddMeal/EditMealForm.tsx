@@ -6,9 +6,7 @@ import "./EditMealForm.css";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import {addCategoryIfNew} from "../../../utils/data/helpers/addCategoryIfNew.ts";
 import {addMeal} from "../../../utils/data/helpers/addMeal.ts";
-import {addMealImages} from "../../../utils/data/helpers/addMealImages.ts";
 import {addTagIfNew} from "../../../utils/data/helpers/addTagIfNew.ts";
-import {removeMealImages} from "../../../utils/data/helpers/removeMealImages.ts";
 import {updateMeal} from "../../../utils/data/helpers/updateMeal.ts";
 import {useTagsAndCategoriesByUser} from "../../../utils/data/helpers/useTagsAndCategoriesByUser.tsx";
 import {syncEngine} from "../../../utils/data/syncEngine.ts";
@@ -16,15 +14,16 @@ import {t} from "../../../utils/translate.ts";
 import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithCreate.tsx";
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
 import {ImageDropzoneGrid} from "../MealImage/ImageDropzoneGrid/ImageDropzoneGrid.tsx";
-import {ImageKind, isExistingImage, isNewImage, type UnifiedImage} from "../MealImage/UnifiedImage.tsx";
+import {ImageKind, isExistingImage, type UnifiedImage} from "../MealImage/UnifiedImage.tsx";
+import {handlePersistImageChanges} from "./handlePersistImageChanges.ts";
 
-const mapMealImagesToUnifiedImages = (dbImages?: MealImage[], mainImageId?: string): UnifiedImage[] => {
+const mapMealImagesToUnifiedImages = (dbImages?: MealImage[]): UnifiedImage[] => {
     if (!dbImages) return [];
     return dbImages.map((img) => ({
         kind: ImageKind.existing,
         id: img.id,
         url: img.publicUrl,
-        isMain: img.id === mainImageId,
+        isMain: img.isMain,
         raw: img,
     }));
 };
@@ -56,20 +55,21 @@ export function EditMealForm({
                              }: EditMealFormProps) {
     const {userId} = useAuth();
     const tagsAndCategories = useTagsAndCategoriesByUser(userId);
-    console.log('mainImgId', existingMeal?.mainImageId)
+
     const tags = tagsAndCategories?.tags ?? [];
     const categories = tagsAndCategories?.categories ?? [];
     const tagNames = tags.map((tag) => tag.name);
     const categoryNames = categories.map((category) => category.name);
 
-    const [images, setImages] = useState<UnifiedImage[]>(() => mapMealImagesToUnifiedImages(existingImages, existingMeal?.mainImageId));
+    const [images, setImages] = useState<UnifiedImage[]>(() => mapMealImagesToUnifiedImages(existingImages));
     const [recipeLink] = useState<string>(existingMeal?.recipeLink ?? "");
     const [videoLink] = useState<string>(existingMeal?.videoLink ?? "");
 
     useEffect(() => {
+        if (isSaving) return;
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setImages(() => mapMealImagesToUnifiedImages(existingImages, existingMeal?.mainImageId));
-    }, [existingImages, existingMeal?.mainImageId]);
+        setImages(() => mapMealImagesToUnifiedImages(existingImages));
+    }, [existingImages]);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -141,6 +141,11 @@ export function EditMealForm({
             const hasImageChanges =
                 hasNewImages ||
                 JSON.stringify(initialImageIds) !== JSON.stringify(currentExistingImageIds);
+            const hasImageOrderChanges = images.some((img, index) => {
+                if (!isExistingImage(img)) return false;
+                const originalImage = existingImages?.find((existingImage) => existingImage.id === img.id);
+                return originalImage ? originalImage.position !== index : false;
+            });
 
             return (
                 currentValues.title !== (existingMeal?.title ?? "") ||
@@ -151,7 +156,8 @@ export function EditMealForm({
                 JSON.stringify(currentTagNames) !== JSON.stringify(originalTagNames) ||
                 recipeLink !== (existingMeal?.recipeLink ?? "") ||
                 videoLink !== (existingMeal?.videoLink ?? "") ||
-                hasImageChanges
+                hasImageChanges ||
+                hasImageOrderChanges
             );
         }
     }));
@@ -171,47 +177,28 @@ export function EditMealForm({
         if (!userId) return;
 
         setIsSaving(true);
-        const upsertMealInput = {
-            title: values.title,
-            freeText: values.freeText,
-            isPrivate: values.isPrivate,
-            isToTry: values.isToTry,
-            categoryId: tagsAndCategories?.categories.find(category => category.name === values.categoryName)?.id,
-            tagIds: tagsAndCategories?.tags.filter((tag) => values.tagNames.includes(tag.name)).map((tag) => tag.id),
-            recipeLink,
-            videoLink,
-            mainImageId: images.find(img => img.isMain)?.id,
-        };
 
         try {
-            let uploadedMealId: string | null;
+            const upsertMealInput = {
+                title: values.title,
+                freeText: values.freeText,
+                isPrivate: values.isPrivate,
+                isToTry: values.isToTry,
+                categoryId: tagsAndCategories?.categories.find(category => category.name === values.categoryName)?.id,
+                tagIds: tagsAndCategories?.tags.filter((tag) => values.tagNames.includes(tag.name)).map((tag) => tag.id),
+                recipeLink,
+                videoLink,
+            }
+
+            const mealId = existingMeal?.id ?? crypto.randomUUID();
+
             if (existingMeal?.id) {
                 await updateMeal(userId, existingMeal.id, upsertMealInput);
-                uploadedMealId = existingMeal.id;
             } else {
-                uploadedMealId = await addMeal(userId, upsertMealInput);
+                await addMeal(userId, mealId, upsertMealInput);
             }
 
-            if (uploadedMealId) {
-                const currentImageIds = new Set(
-                    images
-                        .filter(isExistingImage)
-                        .map((img) => img.id)
-                );
-                const removedImageIds = (existingImages ?? [])
-                    .filter((img) => !currentImageIds.has(img.id))
-                    .map((img) => img.id);
-
-                if (removedImageIds.length > 0) {
-                    await removeMealImages(userId, uploadedMealId, removedImageIds);
-                }
-
-                const newUploads = images.filter(isNewImage);
-
-                if (newUploads.length > 0) {
-                    await addMealImages(userId, uploadedMealId, newUploads);
-                }
-            }
+            await handlePersistImageChanges(existingImages, images, mealId, userId);
 
             await syncEngine.runSync();
             onSuccess?.();
