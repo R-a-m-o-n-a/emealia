@@ -1,4 +1,4 @@
-import {Modal} from '@mantine/core';
+import {FocusTrap, Modal} from '@mantine/core';
 import {useEffect} from "react";
 import classes from './CarouselModal.module.css';
 import {ImageCarousel, type ImageCarouselProps} from './ImageCarousel';
@@ -40,7 +40,6 @@ export function CarouselModal({
 
     return (
         <Modal
-            autoFocus={false}
             centered
             keepMounted={true}
             onClose={onClose}
@@ -54,6 +53,7 @@ export function CarouselModal({
                 body: classes.modalBody,
             }}
         >
+            <FocusTrap.InitialFocus />
             <ImageCarousel
                 images={images}
                 startIndex={startIndex}
