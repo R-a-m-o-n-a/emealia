@@ -15,11 +15,12 @@ export function CarouselModal({
                               }: CarouselModalProps) {
     return (
         <Modal
-            opened={isOpen}
-            onClose={onClose}
             centered
             keepMounted={true}
+            onClose={onClose}
+            opened={isOpen}
             padding={0}
+            removeScrollProps={{allowPinchZoom: true}}
             size="auto"
             withCloseButton={false}
             classNames={{
