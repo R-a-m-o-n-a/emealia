@@ -8,6 +8,7 @@ import {AuthProvider} from "./contexts/AuthContext.tsx";
 import {router} from "./router.tsx";
 import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css'; // ‼️ import dropzone styles after core package styles
+import '@mantine/carousel/styles.css';
 import {theme} from './theme.ts';
 import {syncEngine} from "./utils/data/syncEngine.ts";
 import {ensureAuthentication} from "./utils/user/getUserId.tsx";

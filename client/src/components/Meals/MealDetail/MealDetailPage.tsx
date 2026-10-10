@@ -1,3 +1,4 @@
+import {useState} from "react";
 import {AiFillEyeInvisible} from "react-icons/ai";
 import {BiSolidHourglassTop} from "react-icons/bi";
 import {useLocation, useNavigate, useParams} from "react-router";
@@ -10,6 +11,7 @@ import {EditButton} from "../../Buttons/EditButton.tsx";
 import {Navbar} from "../../Navbar/Navbar.tsx";
 import {RecipeLink} from "../LinkButtons/RecipeLink.tsx";
 import {VideoLink} from "../LinkButtons/VideoLink.tsx";
+import {CarouselModal} from "../MealImage/CarouselModal.tsx";
 import {MealImageGrid} from "../MealImage/MealImageGrid/MealImageGrid.tsx";
 import {MealImageGridImage} from "../MealImage/MealImageGrid/MealImageGridImage.tsx";
 import {InfoIcon} from "./InfoIcon.tsx";
@@ -28,6 +30,9 @@ export function MealDetailPage() {
     const tags = useTagsByMealId(mealId);
     const mealImages = useMealImagesByMealId(mealId);
 
+    const [carouselStartIndex, setCarouselStartIndex] = useState(0);
+    const [isCarouselOpen, setIsCarouselOpen] = useState(false);
+
     function navigateToEdit() {
         navigate(`/meals/edit/${mealId}`, {state: {fromDetails: true, meal, tags, category, mealImages}});
     }
@@ -38,6 +43,15 @@ export function MealDetailPage() {
         } else {
             navigate('/meals');
         }
+    }
+
+    function openCarousel(index: number) {
+        setCarouselStartIndex(index);
+        setIsCarouselOpen(true);
+    }
+
+    function closeCarousel() {
+        setIsCarouselOpen(false);
     }
 
     return (
@@ -69,9 +83,20 @@ export function MealDetailPage() {
                                 key={image.id}
                                 src={image.publicUrl}
                                 alt={`Meal Image ${index + 1}`}
+                                onClick={() => {
+                                    openCarousel(index)
+                                }}
                             />
                         ))}
                     </MealImageGrid>
+                    {mealImages && (
+                        <CarouselModal
+                            startIndex={carouselStartIndex}
+                            isOpen={isCarouselOpen}
+                            onClose={closeCarousel}
+                            images={mealImages}
+                        />
+                    )}
                 </>
             )}
         </>

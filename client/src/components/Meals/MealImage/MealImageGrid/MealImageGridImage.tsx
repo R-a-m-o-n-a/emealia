@@ -5,9 +5,10 @@ interface MealImageProps {
     src: string;
     alt: string;
     isMain?: boolean;
+    onClick?: () => void;
 }
 
-export function MealImageGridImage({src, alt, isMain}: MealImageProps) {
+export function MealImageGridImage({src, alt, isMain, onClick}: MealImageProps) {
     const maskStyle = isMain
         ? {
             WebkitMask: "radial-gradient(circle, black 66%, rgba(0, 0, 0, 0.3) 0)",
@@ -24,6 +25,7 @@ export function MealImageGridImage({src, alt, isMain}: MealImageProps) {
             fit="cover"
             alt={alt}
             style={maskStyle}
+            onClick={onClick}
         />
     );
 }

@@ -1,0 +1,46 @@
+.carouselWrapper {
+    position: relative;
+    overflow: hidden;
+    transition: width 150ms ease,
+    height 150ms ease;
+}
+
+.carouselRoot,
+.carouselRoot :global(.mantine-Carousel-viewport),
+.carouselRoot :global(.mantine-Carousel-container),
+.carouselRoot :global(.mantine-Carousel-slide) {
+    width: 100%;
+    height: 100%;
+}
+
+.carouselImage {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.carouselControls {
+    position: absolute;
+    inset: 0 15px;
+    top: 0 !important;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.carouselControl {
+    pointer-events: auto;
+}
+
+.closeButton {
+    position: absolute !important;
+    top: 15px;
+    right: 15px;
+    z-index: 3;
+    pointer-events: auto;
+}
+
+.carouselIndicators {
+    bottom: 15px;
+    z-index: 2;
+}
