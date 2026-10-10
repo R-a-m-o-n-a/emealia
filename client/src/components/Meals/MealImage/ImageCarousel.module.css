@@ -1,8 +1,8 @@
 .carouselWrapper {
     position: relative;
     overflow: hidden;
-    transition: width 150ms ease,
-    height 150ms ease;
+    transition: width 450ms ease-out,
+    height 450ms ease-out;
 }
 
 .carouselRoot,
