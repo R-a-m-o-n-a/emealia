@@ -26,14 +26,14 @@ export function CarouselModal({
         } else {
             viewportMeta.setAttribute(
                 'content',
-                'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no'
+                'width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no'
             );
         }
 
         return () => {
             viewportMeta.setAttribute(
                 'content',
-                'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no'
+                'width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no'
             );
         };
     }, [isOpen]);
