@@ -40,6 +40,7 @@ export function CarouselModal({
 
     return (
         <Modal
+            autoFocus={false}
             centered
             keepMounted={true}
             onClose={onClose}

@@ -28,8 +28,22 @@
     pointer-events: none;
 }
 
-.carouselControl {
+.carouselControl,
+.closeButton {
     pointer-events: auto;
+    background-color: var(--mantine-color-white) !important;
+    color: var(--mantine-color-black) !important;
+    box-shadow: var(--mantine-shadow-md);
+    border: 1px solid var(--mantine-color-gray-3) !important;
+    transition: opacity 100ms ease;
+    caret-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.carouselControl:hover,
+.closeButton:hover {
+    opacity: 1;
 }
 
 .closeButton {
@@ -37,7 +51,14 @@
     top: 15px;
     right: 15px;
     z-index: 3;
-    pointer-events: auto;
+}
+
+:where([data-mantine-color-scheme="light"]) .closeButton {
+    opacity: 0.85;
+}
+
+:where([data-mantine-color-scheme="dark"]) .closeButton {
+    opacity: 0.65;
 }
 
 .carouselIndicators {

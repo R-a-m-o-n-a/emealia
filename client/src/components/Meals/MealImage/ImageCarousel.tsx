@@ -77,7 +77,7 @@ export function ImageCarousel({images, startIndex, onClose,}: ImageCarouselProps
                 <Modal.CloseButton
                     onClick={onClose}
                     className={classes.closeButton}
-                    variant={"light"}
+                    size={"lg"}
                 />
             )}
 
