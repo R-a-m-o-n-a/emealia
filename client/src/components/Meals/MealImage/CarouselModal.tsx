@@ -1,4 +1,5 @@
 import {Modal} from '@mantine/core';
+import {useEffect} from "react";
 import classes from './CarouselModal.module.css';
 import {ImageCarousel, type ImageCarouselProps} from './ImageCarousel';
 
@@ -13,6 +14,30 @@ export function CarouselModal({
                                   images,
                                   startIndex,
                               }: CarouselModalProps) {
+    useEffect(function enableUserScalableWhileModalIsOpen() {
+        const viewportMeta = document.querySelector('meta[name="viewport"]');
+        if (!viewportMeta) return;
+
+        if (isOpen) {
+            viewportMeta.setAttribute(
+                'content',
+                'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes'
+            );
+        } else {
+            viewportMeta.setAttribute(
+                'content',
+                'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no'
+            );
+        }
+
+        return () => {
+            viewportMeta.setAttribute(
+                'content',
+                'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no'
+            );
+        };
+    }, [isOpen]);
+
     return (
         <Modal
             centered
