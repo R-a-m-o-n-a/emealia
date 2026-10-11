@@ -1,15 +1,24 @@
-import {Link} from 'react-router';
 import {ActionIcon} from '@mantine/core';
 import {TbPlus} from 'react-icons/tb';
+import {Link} from 'react-router';
 
-export function AddButton({}) {
+interface AddButtonProps {
+    type: 'meals' | 'plans';
+}
+
+export function AddButton({type}: AddButtonProps) {
+    console.log(type);
+    const isMeal = type === 'meals';
+    const targetPath = isMeal ? '/meals/add' : '/plans/add';
+    const label = isMeal ? 'Add meal' : 'Add plan';
+
     return (
         <ActionIcon
             component={Link}
-            to="/meals/add"
-            aria-label="Add meal"
+            to={targetPath}
+            aria-label={label}
         >
-            <TbPlus size={20}/>
+            <TbPlus size={20} />
         </ActionIcon>
     );
 }

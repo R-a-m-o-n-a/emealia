@@ -9,8 +9,10 @@ import {router} from "./router.tsx";
 import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css'; // ‼️ import dropzone styles after core package styles
 import '@mantine/carousel/styles.css';
+import '@mantine/dates/styles.css';
 import {theme} from './theme.ts';
 import {syncEngine} from "./utils/data/syncEngine.ts";
+import {DatesProviderWithDynamicLocale} from "./utils/providers/DatesProviderWithDynamicLocale.tsx";
 import {ensureAuthentication} from "./utils/user/getUserId.tsx";
 
 try {
@@ -24,7 +26,9 @@ try {
         <StrictMode>
             <AuthProvider>
                 <MantineProvider theme={theme} defaultColorScheme={"auto"}>
-                    <RouterProvider router={router} />
+                    <DatesProviderWithDynamicLocale>
+                        <RouterProvider router={router} />
+                    </DatesProviderWithDynamicLocale>
                 </MantineProvider>
             </AuthProvider>
         </StrictMode>,

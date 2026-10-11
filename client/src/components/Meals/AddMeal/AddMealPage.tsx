@@ -1,4 +1,3 @@
-import "./AddMealPage.css";
 import {useState} from "react";
 import {useNavigate} from "react-router";
 import {BackButton} from "../../Buttons/BackButton.tsx";

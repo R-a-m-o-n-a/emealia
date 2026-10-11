@@ -6,6 +6,8 @@ import {AddMealPage} from "./components/Meals/AddMeal/AddMealPage.tsx";
 import {EditMealPage} from "./components/Meals/AddMeal/EditMealPage.tsx";
 import {MealDetailPage} from "./components/Meals/MealDetail/MealDetailPage.tsx";
 import {MealsPage} from "./components/Meals/MealsPage.tsx";
+import {AddPlanPage} from "./components/Plans/AddPlan/AddPlanPage.tsx";
+import {EditPlanPage} from "./components/Plans/AddPlan/EditPlanPage.tsx";
 import {PlansPage} from "./components/Plans/PlansPage.tsx";
 import type {AppRouteHandle} from './navigation/routeHandles.ts';
 
@@ -17,7 +19,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Navigate to="/meals" replace/>,
+                element: <Navigate to="/meals" replace />,
             },
             {
                 Component: FloatingNavLayout,
@@ -44,6 +46,14 @@ export const router = createBrowserRouter([
             {
                 path: 'meals/edit/:id',
                 Component: EditMealPage,
+            },
+            {
+                path: 'plans/add',
+                Component: AddPlanPage,
+            },
+            {
+                path: 'plans/edit/:id',
+                Component: EditPlanPage,
             },
         ],
     },

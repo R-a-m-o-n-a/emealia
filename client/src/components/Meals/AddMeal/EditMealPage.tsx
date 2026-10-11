@@ -1,4 +1,3 @@
-import "./AddMealPage.css";
 import {Button, Group, Modal} from "@mantine/core";
 import {useRef, useState} from "react";
 import {useLocation, useNavigate, useParams} from "react-router";

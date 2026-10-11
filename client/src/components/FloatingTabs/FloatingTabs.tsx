@@ -11,7 +11,7 @@ import {
     TbSalad,
     TbSoup
 } from "react-icons/tb";
-import {useLocation, useNavigate} from 'react-router';
+import {useNavigate} from 'react-router';
 import {LabelWithIcon} from "./LabelWithIcon";
 
 const MEAL_ICONS = [
@@ -29,12 +29,8 @@ const getRandomMealIcon = (previousIcon?: unknown) => {
     return availableIcons[Math.floor(Math.random() * availableIcons.length)];
 };
 
-export function FloatingTabs() {
-    const location = useLocation();
+export function FloatingTabs({activeTab}: { activeTab: 'meals' | 'plans' }) {
     const navigate = useNavigate();
-
-    const currentPathname = location.pathname.split('/')[1];
-    const activeValue = currentPathname === 'plans' ? 'plans' : 'meals';
 
     const [currentMealIcon, setCurrentMealIcon] = useState(() => getRandomMealIcon());
 
@@ -72,7 +68,7 @@ export function FloatingTabs() {
 
     return (
         <SegmentedControl
-            value={activeValue}
+            value={activeTab}
             onChange={handleTabChange}
             transitionDuration={150}
             transitionTimingFunction="cubic-bezier(0.4, 0, 0.2, 1)"
