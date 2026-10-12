@@ -16,6 +16,7 @@ export async function addPlan(userId: string, planId: string, input: UpsertPlanI
         date: input.date,
         hasDate: input.hasDate,
         gotEverything: input.gotEverything,
+        connectedMealId: input.connectedMealId,
     };
 
     await db.plans.add(newPlan);

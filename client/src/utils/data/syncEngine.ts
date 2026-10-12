@@ -74,7 +74,17 @@ export class SyncEngine {
             }))
         );
 
-        // Map camelCase to snake_case and exclude local-only sync fields (like syncStatus & localBlob)
+        // Converts undefined and empty strings to null for PostgreSQL compatibility
+        const sanitizeForPostgres = (obj: Record<string, unknown>) => {
+            return Object.fromEntries(
+                Object.entries(obj).map(([key, value]) => [
+                    key,
+                    value === undefined || value === '' ? null : value,
+                ])
+            );
+        };
+
+        // Map camelCase to snake_case, sanitize values, and exclude local-only sync fields
         const payload = dirtyRecords.map((record) => {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const {syncStatus, localBlob, r2UploadStatus, r2DeletionStatus, ...rest} = record as T & {
@@ -82,7 +92,8 @@ export class SyncEngine {
                 r2UploadStatus?: string,
                 r2DeletionStatus?: string,
             };
-            return toLowerSnakeCase({...rest, updatedAt: new Date().toISOString()});
+            const snakeCaseRecord = toLowerSnakeCase({...rest, updatedAt: new Date().toISOString()});
+            return sanitizeForPostgres(snakeCaseRecord as Record<string, unknown>);
         });
 
         const {error} = await supabase.from(remoteTable).upsert(payload);
@@ -124,17 +135,28 @@ export class SyncEngine {
 
         if (error || !remoteRecords || remoteRecords.length === 0) return;
 
+        // Converts database nulls back to undefined for TypeScript model alignment
+        const sanitizeFromPostgres = (obj: Record<string, unknown>) => {
+            return Object.fromEntries(
+                Object.entries(obj).map(([key, value]) => [
+                    key,
+                    value === null ? undefined : value,
+                ])
+            );
+        };
+
         await db.transaction('rw', table, async () => {
             for (const rawRecord of remoteRecords) {
                 const recordInCamelCase = toCamelCase<T>(rawRecord);
-                const localRecord = await table.get(recordInCamelCase.id);
+                const sanitizedRecord = sanitizeFromPostgres(recordInCamelCase as Record<string, unknown>);
+                const localRecord = await table.get((sanitizedRecord as T).id);
 
                 if (localRecord && (localRecord.syncStatus === 'pending' || localRecord.syncStatus === 'syncing')) {
                     continue; // Local un-pushed changes take precedence
                 }
 
                 const syncedRecord = {
-                    ...recordInCamelCase,
+                    ...sanitizedRecord,
                     syncStatus: 'synced',
                 } as unknown as T;
 

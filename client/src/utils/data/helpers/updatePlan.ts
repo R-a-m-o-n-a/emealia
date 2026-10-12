@@ -24,7 +24,9 @@ export async function updatePlan(
     planUpdates.date = input.date;
     planUpdates.hasDate = input.hasDate;
     planUpdates.gotEverything = input.gotEverything;
-    planUpdates.connectedMealId = input.connectedMealId;
+    if (input.connectedMealId) {
+        planUpdates.connectedMealId = input.connectedMealId;
+    }
 
     await db.plans.update(planId, planUpdates);
 }
