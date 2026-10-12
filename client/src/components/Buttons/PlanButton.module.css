@@ -1,0 +1,6 @@
+.PlanButton {
+    position: fixed;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    right: calc(16px + env(safe-area-inset-right));
+    z-index: 1000;
+}

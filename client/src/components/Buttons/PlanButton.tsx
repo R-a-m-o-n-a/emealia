@@ -3,6 +3,8 @@ import {Button} from '@mantine/core';
 import {TbClipboardListFilled} from 'react-icons/tb';
 import {useNavigate} from 'react-router';
 
+import classes from './PlanButton.module.css';
+
 export function PlanButton({meal}: { meal: Meal }) {
     const navigate = useNavigate();
 
@@ -13,10 +15,11 @@ export function PlanButton({meal}: { meal: Meal }) {
     // todo make floating at bottom right
     return (
         <Button
+            className={classes.PlanButton}
             onClick={navigateToAddPlan}
             leftSection={<TbClipboardListFilled size={18} />}
             radius="xl"
-            variant="light"
+            variant="default"
         >
             Plan
         </Button>
