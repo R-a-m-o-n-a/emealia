@@ -1,8 +1,7 @@
-import "./PlansPage.css";
+import {PlansList} from "./PlansList.tsx";
 
-export function PlansPage({}) {
+export function PlansPage() {
     return (
-        <div className={"PlansPage"}>
-        </div>
+        <PlansList />
     );
 }

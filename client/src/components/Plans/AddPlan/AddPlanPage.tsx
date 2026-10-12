@@ -14,14 +14,14 @@ export function AddPlanPage() {
     }
 
     return (
-        <div className={"AddMealPage"}>
+        <>
             <Navbar>
                 <BackButton />
-                New Meal
+                New Plan
                 <DoneButton isLoading={isSaving} />
             </Navbar>
 
             <EditPlanForm isSaving={isSaving} setIsSaving={setIsSaving} onSuccess={navigateToPlans} />
-        </div>
+        </>
     );
 }

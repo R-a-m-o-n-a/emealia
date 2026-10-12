@@ -33,7 +33,7 @@ export function EditPlanPage() {
     }
 
     return (
-        <div className={"AddPlanPage"}>
+        <>
             <Navbar>
                 <BackButton onClickOverwrite={handleBackClick} />
                 Edit Plan
@@ -72,6 +72,6 @@ export function EditPlanPage() {
                     </Button>
                 </Group>
             </Modal>
-        </div>
+        </>
     );
 }

@@ -7,7 +7,6 @@ interface AddButtonProps {
 }
 
 export function AddButton({type}: AddButtonProps) {
-    console.log(type);
     const isMeal = type === 'meals';
     const targetPath = isMeal ? '/meals/add' : '/plans/add';
     const label = isMeal ? 'Add meal' : 'Add plan';
