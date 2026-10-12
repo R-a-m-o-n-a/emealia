@@ -1,59 +1,105 @@
 import {DatesProvider} from '@mantine/dates';
 import dayjs from 'dayjs';
-// Import dayjs from the esm build path so glob can properly map it
-import 'dayjs/esm/locale/en';
 import {useEffect, useState} from 'react';
-import 'dayjs/esm/locale/de';
 
-const preloadedLocales = ['en', 'de'];
+type DayjsLocale = NonNullable<
+    Exclude<Parameters<typeof dayjs.locale>[0], string>
+>;
 
-// Preload all dayjs locale modules eagerly using Vite's glob on the ESM path
-const localeModules = import.meta.glob('../../../../node_modules/dayjs/esm/locale/*.js', {eager: true});
+type LocaleModule = {
+    default: DayjsLocale;
+};
+
+// Lazy: Vite creates a separate chunk for each locale.
+// No locale module is downloaded or evaluated until its loader is called.
+const localeLoaders = import.meta.glob(
+    '../../../../node_modules/dayjs/esm/locale/*.js'
+) as Record<string, () => Promise<LocaleModule>>;
 
 function getBrowserLocale(): string {
-    if (typeof window === 'undefined') return 'en';
-    const primaryLocale = navigator.languages?.[0] || navigator.language;
-    return primaryLocale || 'en';
+    if (typeof window === 'undefined') {
+        return 'en';
+    }
+
+    return (navigator.languages?.[0] ?? navigator.language ?? 'en')
+        .toLowerCase()
+        .replaceAll('_', '-');
 }
 
-function loadDayjsLocale(locale: string): string {
-    if (preloadedLocales.includes(locale)) {
-        return locale;
+async function registerLocale(locale: string): Promise<boolean> {
+    // English is built into Day.js, so no separate locale chunk is required.
+    if (locale === 'en') {
+        return true;
     }
 
     const path = `../../../../node_modules/dayjs/esm/locale/${locale}.js`;
+    const loadLocale = localeLoaders[path];
 
-    if (localeModules[path]) {
-        return locale;
+    if (!loadLocale) {
+        return false;
     }
 
-    // Try fallback to base language (e.g., 'fr' from 'fr-CA')
-    const baseLocale = locale.split('-')[0];
-    const basePath = `../../../../node_modules/dayjs/esm/locale/${baseLocale}.js`;
+    const localeModule = await loadLocale();
 
-    if (baseLocale && baseLocale !== locale && localeModules[basePath]) {
-        return baseLocale;
+    // The ESM locale registers itself with ESM Day.js. Register its locale
+    // definition with the normal Day.js instance used by Mantine as well.
+    dayjs.locale(localeModule.default, undefined, true);
+
+    return true;
+}
+
+async function resolveAndRegisterLocale(browserLocale: string): Promise<string> {
+    const baseLocale = browserLocale.split('-')[0];
+
+    for (const candidate of [browserLocale, baseLocale, 'en']) {
+        if (await registerLocale(candidate)) {
+            return candidate;
+        }
     }
 
-    console.warn(`Locale '${locale}' not found, falling back to 'en'.`);
     return 'en';
 }
 
-export function DatesProviderWithDynamicLocale({children}: { children: React.ReactNode }) {
+export function DatesProviderWithDynamicLocale({
+                                                   children,
+                                               }: {
+    children: React.ReactNode;
+}) {
     const [activeLocale, setActiveLocale] = useState('en');
 
     useEffect(() => {
-        const rawLocale = getBrowserLocale().toLowerCase();
-        const resolvedLocale = loadDayjsLocale(rawLocale);
+        let cancelled = false;
 
-        // Ensure dayjs is globally synchronized with the locale
-        dayjs.locale(resolvedLocale);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setActiveLocale(resolvedLocale);
+        async function initializeLocale() {
+            try {
+                const locale = await resolveAndRegisterLocale(getBrowserLocale());
+
+                if (cancelled) {
+                    return;
+                }
+
+                // Optional for Mantine, but useful for application calls such as:
+                // dayjs().format('L')
+                dayjs.locale(locale);
+
+                setActiveLocale(locale);
+            } catch (error) {
+                console.warn('Failed to load Day.js locale; using English.', error);
+
+                if (!cancelled) {
+                    dayjs.locale('en');
+                    setActiveLocale('en');
+                }
+            }
+        }
+
+        void initializeLocale();
+
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
-    console.log(activeLocale)
-    // todo somehow even though the locale is recognized and seemingly loaded now, it does not reflect in the date component, it's always in en-US...
     return (
         <DatesProvider settings={{locale: activeLocale}}>
             {children}
