@@ -148,12 +148,15 @@ export class SyncEngine {
         await db.transaction('rw', table, async () => {
             for (const rawRecord of remoteRecords) {
                 const recordInCamelCase = toCamelCase<T>(rawRecord);
-                const sanitizedRecord = sanitizeFromPostgres(recordInCamelCase as Record<string, unknown>);
-                const localRecord = await table.get((sanitizedRecord as T).id);
+                const localRecord = await table.get(recordInCamelCase.id);
 
                 if (localRecord && (localRecord.syncStatus === 'pending' || localRecord.syncStatus === 'syncing')) {
                     continue; // Local un-pushed changes take precedence
                 }
+
+                const sanitizedRecord = sanitizeFromPostgres(
+                    recordInCamelCase as unknown as Record<string, unknown>
+                ) as unknown as T;
 
                 const syncedRecord = {
                     ...sanitizedRecord,
