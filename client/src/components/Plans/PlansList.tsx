@@ -5,7 +5,7 @@ import {PlanItem} from "./PlanItem.tsx";
 export function PlansList() {
     const {userId} = useAuth();
     const plans = usePlans(userId);
-    console.log(plans);
+
     return (
         <>
             {plans?.map((plan) => (

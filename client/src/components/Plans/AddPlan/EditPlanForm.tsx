@@ -14,7 +14,7 @@ export interface EditPlanFormHandle {
 }
 
 interface EditPlanFormProps {
-    existingPlan?: Plan
+    existingPlan?: Partial<Plan>
     isSaving: boolean
     setIsSaving: Dispatch<SetStateAction<boolean>>
     onSuccess?: () => void;
@@ -50,7 +50,7 @@ export function EditPlanForm({
         if (!existingPlan) return;
 
         form.initialize({
-            title: existingPlan.title,
+            title: existingPlan.title ?? "",
             date: existingPlan.date ?? "",
             hasDate: existingPlan.hasDate ?? false,
             gotEverything: existingPlan.gotEverything ?? true,

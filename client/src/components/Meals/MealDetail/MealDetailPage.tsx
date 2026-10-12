@@ -8,6 +8,7 @@ import {useMealImagesByMealId} from "../../../utils/data/helpers/useMealImagesBy
 import {useTagsByMealId} from "../../../utils/data/helpers/useTagsByMealId.tsx";
 import {BackButton} from "../../Buttons/BackButton.tsx";
 import {EditButton} from "../../Buttons/EditButton.tsx";
+import {PlanButton} from "../../Buttons/PlanButton.tsx";
 import {Navbar} from "../../Navbar/Navbar.tsx";
 import {RecipeLink} from "../LinkButtons/RecipeLink.tsx";
 import {VideoLink} from "../LinkButtons/VideoLink.tsx";
@@ -97,6 +98,7 @@ export function MealDetailPage() {
                             images={mealImages}
                         />
                     )}
+                    <PlanButton meal={meal} />
                 </>
             )}
         </>
