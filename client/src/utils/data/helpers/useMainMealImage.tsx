@@ -6,10 +6,13 @@ export function useMainMealImage(mealId: string | undefined) {
         if (!mealId) {
             return undefined;
         }
-        return await db.mealImages
+        
+        const images = await db.mealImages
             .where('mealId')
             .equals(mealId)
-            .filter((image) => !image.isDeleted && image.isMain)
-            .first();
+            .filter((image) => !image.isDeleted)
+            .toArray();
+
+        return images.find((image) => image.isMain) ?? images[0];
     }, [mealId]);
 }

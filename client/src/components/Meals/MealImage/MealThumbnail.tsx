@@ -2,10 +2,22 @@ import {Box, Image} from '@mantine/core';
 import {TbSalad} from "react-icons/tb";
 import {useMainMealImage} from "../../../utils/data/helpers/useMainMealImage.tsx";
 
-const thumbnailWidth = 80;
-const thumbnailHeight = 80;
+const defaultWidth = 80;
+const defaultHeight = 80;
 
-export function MainMealImage({mealId, mealTitle}: { mealId: string, mealTitle: string }) {
+interface MealThumbnailProps {
+    mealId: string,
+    mealTitle: string,
+    thumbnailWidth?: number | string,
+    thumbnailHeight?: number | string,
+}
+
+export function MealThumbnail({
+                                  mealId,
+                                  mealTitle,
+                                  thumbnailWidth = defaultWidth,
+                                  thumbnailHeight = defaultHeight
+                              }: MealThumbnailProps) {
     const image = useMainMealImage(mealId);
 
     if (!image) {

@@ -1,6 +1,6 @@
 import type {Meal} from "@emealia/shared";
 import {useNavigate} from "react-router";
-import {MainMealImage} from "../MealImage/MainMealImage.tsx";
+import {MealThumbnail} from "../MealImage/MealThumbnail.tsx";
 
 import classes from "./MealListItem.module.css";
 
@@ -14,7 +14,7 @@ export function MealListItem({meal}: { meal: Meal }) {
 
     return (
         <div className={classes.mealListItem} onClick={openDetailPage}>
-            <MainMealImage mealId={meal.id} mealTitle={meal.title} />
+            <MealThumbnail mealId={meal.id} mealTitle={meal.title} />
             {meal.title}
         </div>
     );
