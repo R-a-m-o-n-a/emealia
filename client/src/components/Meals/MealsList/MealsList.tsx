@@ -13,7 +13,7 @@ export function MealsList() {
     const result = useMeals(userId);
 
     if (!result) {
-        return <div className={classes.MealsList}>Loading...</div>;
+        return <div className={classes.mealsList}>Loading...</div>;
     }
 
     const {meals, categoryMap, tagMap} = result;
@@ -37,7 +37,7 @@ export function MealsList() {
     });
 
     return (
-        <div className={classes.MealsList}>
+        <div className={classes.mealsList}>
             {sortedCategoryIds.map((categoryId) => {
                 const categoryName = categoryMap.get(categoryId) ?? t('Uncategorized');
                 const categoryMeals = mealsByCategory[categoryId];
