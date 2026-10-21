@@ -1,5 +1,5 @@
-.PlanButton {
-    position: fixed;
+button.PlanButton {
+    position: fixed; /*fixed position seems to not work on iPhone this way*/
     bottom: calc(16px + env(safe-area-inset-bottom));
     right: calc(16px + env(safe-area-inset-right));
     z-index: 1000;

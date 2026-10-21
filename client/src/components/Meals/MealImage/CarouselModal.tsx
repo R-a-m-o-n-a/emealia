@@ -8,6 +8,7 @@ export interface CarouselModalProps extends Omit<ImageCarouselProps, 'onClose'> 
     onClose: () => void;
 }
 
+// todo very wide images on bigger screens don't get shown in full. fix it. http://localhost:5173/meals/25741e39-91fa-4890-9ee7-eb526d361a14
 export function CarouselModal({
                                   isOpen,
                                   onClose,
