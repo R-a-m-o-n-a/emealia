@@ -1,5 +1,6 @@
-import "./VideoLink.css";
 import {t} from "../../../utils/translate.ts";
+
+import classes from "./VideoLink.module.css";
 
 export function VideoLink({link}: { link: string }) {
     function openLink() {
@@ -7,7 +8,7 @@ export function VideoLink({link}: { link: string }) {
     }
 
     return (
-        <button className={"RecipeLink"} onClick={openLink}>
+        <button className={classes.videoLink} onClick={openLink}>
             {t('Video')}
         </button>
     );

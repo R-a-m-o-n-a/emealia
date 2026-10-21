@@ -1,16 +1,16 @@
-.MealDetailHeading {
+.heading {
     display: flex;
     flex-direction: column;
     flex-shrink: 1;
     align-items: flex-start;
 }
 
-.MealDetailHeading-category {
+.category {
     line-height: 1;
     font-size: 1rem;
 }
 
-.MealDetailHeading-title {
+.title {
     font-size: 1.75rem;
     margin: 0;
     line-height: 1;

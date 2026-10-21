@@ -1,9 +1,10 @@
-import "./MealsList.css";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import {useMeals} from "../../../utils/data/helpers/useMeals.ts";
 import {t} from "../../../utils/translate.ts";
 import {CategorySectionHeader} from "./CategorySectionHeader.tsx";
 import {MealListItem} from "./MealListItem.tsx";
+
+import classes from "./MealsList.module.css";
 
 const UNCATEGORIZED_KEY = '__uncategorized__';
 
@@ -12,7 +13,7 @@ export function MealsList() {
     const result = useMeals(userId);
 
     if (!result) {
-        return <div className="MealsList">Loading...</div>;
+        return <div className={classes.MealsList}>Loading...</div>;
     }
 
     const {meals, categoryMap, tagMap} = result;
@@ -36,16 +37,16 @@ export function MealsList() {
     });
 
     return (
-        <div className="MealsList">
+        <div className={classes.MealsList}>
             {sortedCategoryIds.map((categoryId) => {
                 const categoryName = categoryMap.get(categoryId) ?? t('Uncategorized');
                 const categoryMeals = mealsByCategory[categoryId];
 
                 return (
                     <section key={categoryId} className="MealsList-categoryGroup">
-                        <CategorySectionHeader name={categoryName} id={categoryId}/>
+                        <CategorySectionHeader name={categoryName} id={categoryId} />
                         {categoryMeals.map((meal) => (
-                            <MealListItem key={meal.id} meal={meal}/>
+                            <MealListItem key={meal.id} meal={meal} />
                         ))}
                     </section>
                 );

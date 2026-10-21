@@ -1,11 +1,11 @@
 import type {IconType} from "react-icons";
 
-import "./InfoIcon.css";
+import classes from "./InfoIcon.module.css";
 
 export function InfoIcon({Icon}: { Icon: IconType }) {
     return (
-        <div className={"InfoIcon"}>
-            <Icon size={20}/>
+        <div className={classes.infoIcon}>
+            <Icon size={20} />
         </div>
     );
 }

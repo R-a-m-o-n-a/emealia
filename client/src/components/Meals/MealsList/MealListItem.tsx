@@ -1,6 +1,7 @@
 import type {Meal} from "@emealia/shared";
 import {useNavigate} from "react-router";
-import "./MealListItem.css";
+
+import classes from "./MealListItem.module.css";
 
 export function MealListItem({meal}: { meal: Meal }) {
     const navigate = useNavigate();
@@ -10,7 +11,7 @@ export function MealListItem({meal}: { meal: Meal }) {
     }
 
     return (
-        <div className="MealListItem" onClick={openDetailPage}>
+        <div className={classes.MealListItem} onClick={openDetailPage}>
             {meal.title}
         </div>
     );

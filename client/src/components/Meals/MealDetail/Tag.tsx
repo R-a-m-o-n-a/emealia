@@ -1,8 +1,8 @@
-import "./Tag.css";
+import classes from "./Tag.module.css";
 
 export function Tag({name}: { name: string }) {
     return (
-        <div className={"Tag"}>
+        <div className={classes.tag}>
             {name}
         </div>
     );

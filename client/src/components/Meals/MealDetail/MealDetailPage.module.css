@@ -1,0 +1,13 @@
+.info {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+
+    div.separatorLine {
+        width: 1px;
+        align-self: stretch;
+        background: grey; /* todo color */
+    }
+}

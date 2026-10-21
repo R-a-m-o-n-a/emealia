@@ -2,7 +2,6 @@ import type {Meal, MealImage, Tag} from "@emealia/shared";
 import {Button, Group, Switch, Textarea, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
 import {type Dispatch, type RefObject, type SetStateAction, useEffect, useImperativeHandle, useState} from "react";
-import "./EditMealForm.css";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
 import {addCategoryIfNew} from "../../../utils/data/helpers/addCategoryIfNew.ts";
 import {addMeal} from "../../../utils/data/helpers/addMeal.ts";
@@ -15,6 +14,8 @@ import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithC
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
 import {ImageDropzoneGrid} from "../MealImage/ImageDropzoneGrid/ImageDropzoneGrid.tsx";
 import {ImageKind, isExistingImage, type UnifiedImage} from "../MealImage/UnifiedImage.tsx";
+
+import classes from "./EditMealForm.module.css";
 import {handlePersistImageChanges} from "./handlePersistImageChanges.ts";
 
 const mapMealImagesToUnifiedImages = (dbImages?: MealImage[]): UnifiedImage[] => {
@@ -210,7 +211,7 @@ export function EditMealForm({
     };
 
     return (
-        <form id="edit-meal-form" onSubmit={form.onSubmit(handleSubmit)} className="EditMealForm">
+        <form id="edit-meal-form" onSubmit={form.onSubmit(handleSubmit)} className={classes.editMealForm}>
             <TextInput
                 radius="sm"
                 placeholder={t("Title")}

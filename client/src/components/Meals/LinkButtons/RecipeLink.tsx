@@ -1,5 +1,6 @@
-import "./RecipeLink.css";
 import {t} from "../../../utils/translate.ts";
+
+import classes from "./RecipeLink.module.css";
 
 export function RecipeLink({link}: { link: string }) {
     function openLink() {
@@ -7,7 +8,7 @@ export function RecipeLink({link}: { link: string }) {
     }
 
     return (
-        <button className={"RecipeLink"} onClick={openLink}>
+        <button className={classes.recipeLink} onClick={openLink}>
             {t('Blog')}
         </button>
     );

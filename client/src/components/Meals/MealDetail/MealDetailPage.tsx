@@ -17,9 +17,9 @@ import {MealImageGrid} from "../MealImage/MealImageGrid/MealImageGrid.tsx";
 import {MealImageGridImage} from "../MealImage/MealImageGrid/MealImageGridImage.tsx";
 import {InfoIcon} from "./InfoIcon.tsx";
 import {MealDetailHeading} from "./MealDetailHeading.tsx";
-import {Tag} from "./Tag.tsx";
 
-import "./MealDetailPage.css";
+import classes from "./MealDetailPage.module.css";
+import {Tag} from "./Tag.tsx";
 
 export function MealDetailPage() {
     const navigate = useNavigate();
@@ -64,18 +64,18 @@ export function MealDetailPage() {
             </Navbar>
             {meal && (
                 <>
-                    <div className={"MealDetailPage-links"}>
+                    <div>
                         {meal?.videoLink && <VideoLink link={meal?.videoLink} />}
                         {meal?.recipeLink && <RecipeLink link={meal?.recipeLink} />}
                     </div>
-                    <div className={"MealDetailPage-info"}>
+                    <div className={classes.info}>
                         {meal?.isPrivate && <InfoIcon Icon={AiFillEyeInvisible} />}
                         {(meal?.isPrivate && meal?.isToTry) && <div className={"separatorLine"} />}
                         {meal?.isToTry && <InfoIcon Icon={BiSolidHourglassTop} />}
                         {(meal?.isToTry && !!tags?.length) && <div className={"separatorLine"} />}
                         {!!tags?.length && tags.map(tag => (<Tag key={tag.id} name={tag.name} />))}
                     </div>
-                    <div className={"MealDetailPage-text"}>
+                    <div>
                         {meal?.freeText}
                     </div>
                     <MealImageGrid>
