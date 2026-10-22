@@ -31,7 +31,7 @@ export function MealThumbnail({
                 display="flex"
                 style={{alignItems: 'center', justifyContent: 'center'}}
             >
-                <TbSalad size={thumbnailWidth / 2} />
+                <TbSalad size={"50%"} />
             </Box>
         );
     }

@@ -32,7 +32,7 @@ export function EditPlanForm({
                                  formRef,
                              }: EditPlanFormProps) {
     const {userId} = useAuth();
-    const [connectedMealId, setConnectedMealId] = useState(existingPlan?.connectedMealId);
+    const [connectedMealId, /*setConnectedMealId*/] = useState(existingPlan?.connectedMealId);
 
     const form = useForm({
         mode: "uncontrolled",
