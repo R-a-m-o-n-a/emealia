@@ -59,7 +59,8 @@ export function EditPlanForm({
             gotEverything: existingPlan.gotEverything ?? true,
             connectedMealId: existingPlan.connectedMealId ?? undefined,
         });
-    }, [existingPlan, form]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [existingPlan]);
 
     useImperativeHandle(formRef, () => ({
         hasChanges: () => {
