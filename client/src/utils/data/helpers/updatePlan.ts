@@ -6,7 +6,7 @@ export interface UpsertPlanInput {
     date?: string;
     hasDate: boolean;
     gotEverything: boolean;
-    connectedMealId?: string;
+    connectedMealId?: string | null;
 }
 
 export async function updatePlan(
@@ -24,9 +24,7 @@ export async function updatePlan(
     planUpdates.date = input.date;
     planUpdates.hasDate = input.hasDate;
     planUpdates.gotEverything = input.gotEverything;
-    if (input.connectedMealId) {
-        planUpdates.connectedMealId = input.connectedMealId;
-    }
+    planUpdates.connectedMealId = input.connectedMealId ?? null;
 
     await db.plans.update(planId, planUpdates);
 }

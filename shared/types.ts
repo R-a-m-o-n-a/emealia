@@ -41,20 +41,20 @@ export interface MissingIngredient extends BaseSyncEntity {
 
 export interface Meal extends BaseSyncEntity {
     title: string;
-    recipeLink?: string;
-    videoLink?: string;
-    freeText?: string; // Supports Markdown formatting
-    categoryId?: string; // Foreign key to Category
-    isToTry?: boolean;
-    isPrivate?: boolean;
+    recipeLink?: string | null;
+    videoLink?: string | null;
+    freeText?: string | null; // Supports Markdown formatting
+    categoryId?: string | null; // Foreign key to Category
+    isToTry?: boolean | null;
+    isPrivate?: boolean | null;
 }
 
 export interface Plan extends BaseSyncEntity {
-    date?: string; // ISO Date string (YYYY-MM-DD)
+    date?: string | null; // ISO Date string (YYYY-MM-DD)
     title: string;
     hasDate: boolean;
     gotEverything: boolean;
-    connectedMealId?: string; // Foreign key to Meal
+    connectedMealId?: string | null; // Foreign key to Meal
 }
 
 export interface UserSettings extends BaseSyncEntity {

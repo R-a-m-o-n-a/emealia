@@ -12,8 +12,8 @@ import classes from "./PlanTitleInput.module.css";
 interface PlanTitleInputProps {
     value: string;
     onChange: (value: string) => void;
-    connectedMealId: string | undefined;
-    onMealSelect: (mealId: string | undefined) => void;
+    connectedMealId: string | null;
+    onMealSelect: (mealId: string | null) => void;
     titleInputProps?: GetInputPropsReturnType;
 }
 
@@ -48,7 +48,7 @@ export function PlanTitleInput({
     }, [fuse, value]);
 
     function disconnectMeal() {
-        onMealSelect(undefined);
+        onMealSelect(null);
     }
 
     return (

@@ -38,7 +38,7 @@ export function EditPlanForm({
             date: "",
             hasDate: false,
             gotEverything: true,
-            connectedMealId: undefined as string | undefined,
+            connectedMealId: null as string | null,
         },
         validate: {
             title: (value) => (value.trim().length > 0 ? null : t("Your plan needs a title")),
@@ -57,7 +57,7 @@ export function EditPlanForm({
             date: existingPlan.date ?? "",
             hasDate: existingPlan.hasDate ?? false,
             gotEverything: existingPlan.gotEverything ?? true,
-            connectedMealId: existingPlan.connectedMealId ?? undefined,
+            connectedMealId: existingPlan.connectedMealId ?? null,
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [existingPlan]);

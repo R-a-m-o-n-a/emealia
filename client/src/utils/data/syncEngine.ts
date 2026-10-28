@@ -135,16 +135,6 @@ export class SyncEngine {
 
         if (error || !remoteRecords || remoteRecords.length === 0) return;
 
-        // Converts database nulls back to undefined for TypeScript model alignment
-        const sanitizeFromPostgres = (obj: Record<string, unknown>) => {
-            return Object.fromEntries(
-                Object.entries(obj).map(([key, value]) => [
-                    key,
-                    value === null ? undefined : value,
-                ])
-            );
-        };
-
         await db.transaction('rw', table, async () => {
             for (const rawRecord of remoteRecords) {
                 const recordInCamelCase = toCamelCase<T>(rawRecord);
@@ -154,12 +144,8 @@ export class SyncEngine {
                     continue; // Local un-pushed changes take precedence
                 }
 
-                const sanitizedRecord = sanitizeFromPostgres(
-                    recordInCamelCase as unknown as Record<string, unknown>
-                ) as unknown as T;
-
                 const syncedRecord = {
-                    ...sanitizedRecord,
+                    ...recordInCamelCase,
                     syncStatus: 'synced',
                 } as unknown as T;
 
