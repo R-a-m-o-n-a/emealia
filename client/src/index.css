@@ -1,5 +1,4 @@
 :root {
-
     --safe-area-top: env(safe-area-inset-top, 0px);
     --safe-area-right: env(safe-area-inset-right, 0px);
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -34,6 +33,10 @@
     @media (max-width: 1024px) {
         font-size: 16px;
     }
+
+    @media (max-width: 400px) {
+        --mantine-scale: 1.12 !important; /* Scales up components on smaller screens */
+    }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -48,12 +51,6 @@
         --accent-border: rgba(192, 132, 252, 0.5);
         --social-bg: rgba(47, 48, 58, 0.5);
         --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-    }
-}
-
-@media (max-width: 400px) {
-    html {
-        font-size: 20px; /* Default is usually 16px; bumping this up scales all rem-based Mantine components up */
     }
 }
 

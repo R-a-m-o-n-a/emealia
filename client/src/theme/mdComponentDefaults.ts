@@ -1,4 +1,5 @@
 import {
+    Autocomplete,
     Button,
     Checkbox,
     Chip,
@@ -15,6 +16,11 @@ import {
 } from '@mantine/core';
 
 export const mdComponentDefaults = {
+    Autocomplete: Autocomplete.extend({
+        defaultProps: {
+            size: 'md',
+        },
+    }),
     Button: Button.extend({
         defaultProps: {
             size: 'md',
