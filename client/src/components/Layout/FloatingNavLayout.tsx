@@ -2,7 +2,7 @@ import {Outlet, useLocation} from 'react-router';
 import {AddButton} from "../Buttons/AddButton.tsx";
 import {FloatingTabs} from "../FloatingTabs/FloatingTabs.tsx";
 
-import "./FloatingNav.css";
+import classes from "./FloatingNav.module.css";
 
 export function FloatingNavLayout() {
     const location = useLocation();
@@ -13,7 +13,7 @@ export function FloatingNavLayout() {
     return (
         <>
             <Outlet />
-            <nav className="FloatingNav">
+            <nav className={classes.floatingNav}>
                 <FloatingTabs activeTab={activeTab} />
                 <AddButton type={activeTab} />
             </nav>

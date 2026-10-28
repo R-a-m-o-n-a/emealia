@@ -1,13 +1,15 @@
 import {Outlet, ScrollRestoration} from 'react-router';
 
+import classes from "./RootLayout.module.css"
+
 export function RootLayout() {
     return (
-        <div className="Emealia-RootLayout">
+        <div className={classes.rootLayout}>
             <main className="">
-                <Outlet/>
+                <Outlet />
             </main>
 
-            <ScrollRestoration/>
+            <ScrollRestoration />
         </div>
     );
 }
