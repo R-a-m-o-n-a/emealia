@@ -1,7 +1,7 @@
 import {useLiveQuery} from 'dexie-react-hooks';
 import {db} from '../db';
 
-export function useCategory(categoryId: string | undefined) {
+export function useCategory(categoryId: string | undefined | null) {
     return useLiveQuery(async () => {
         if (!categoryId) {
             return undefined;
