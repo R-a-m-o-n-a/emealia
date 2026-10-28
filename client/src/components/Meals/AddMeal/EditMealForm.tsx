@@ -1,5 +1,5 @@
 import type {Meal, MealImage, Tag} from "@emealia/shared";
-import {Button, Group, Switch, Textarea, TextInput} from "@mantine/core";
+import {Box, Button, Group, Switch, Textarea, TextInput} from "@mantine/core";
 import {useForm} from "@mantine/form";
 import {type Dispatch, type RefObject, type SetStateAction, useEffect, useImperativeHandle, useState} from "react";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
@@ -12,6 +12,7 @@ import {syncEngine} from "../../../utils/data/syncEngine.ts";
 import {t} from "../../../utils/translate.ts";
 import {CustomAutocompleteWithCreate} from "../../Inputs/CustomAutocompleteWithCreate.tsx";
 import {CustomTagsInput} from "../../Inputs/CustomTagsInput.tsx";
+import {PasteLinkButton} from "../LinkButtons/PasteLinkButton.tsx";
 import {ImageDropzoneGrid} from "../MealImage/ImageDropzoneGrid/ImageDropzoneGrid.tsx";
 import {ImageKind, isExistingImage, type UnifiedImage} from "../MealImage/UnifiedImage.tsx";
 
@@ -63,14 +64,12 @@ export function EditMealForm({
     const categoryNames = categories.map((category) => category.name);
 
     const [images, setImages] = useState<UnifiedImage[]>(() => mapMealImagesToUnifiedImages(existingImages));
-    const [recipeLink] = useState<string>(existingMeal?.recipeLink ?? "");
-    const [videoLink] = useState<string>(existingMeal?.videoLink ?? "");
 
     useEffect(() => {
         if (isSaving) return;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setImages(() => mapMealImagesToUnifiedImages(existingImages));
-    }, [existingImages]);
+    }, [existingImages, isSaving]);
 
     const form = useForm({
         mode: "uncontrolled",
@@ -81,6 +80,8 @@ export function EditMealForm({
             isPrivate: false,
             isToTry: false,
             tagNames: [] as string[],
+            recipeLink: "",
+            videoLink: "",
         },
         validate: {
             title: (value) => (value.trim().length > 0 ? null : t("Your meal needs a title")),
@@ -97,9 +98,12 @@ export function EditMealForm({
             isPrivate: existingMeal.isPrivate || false,
             isToTry: existingMeal.isToTry || false,
             tagNames: [],
+            recipeLink: existingMeal.recipeLink ?? "",
+            videoLink: existingMeal.videoLink ?? "",
         });
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [existingMeal]);
+    }, [existingMeal, existingCategoryName]);
 
     useEffect(() => {
         if (!existingMeal || !tagsAndCategories?.categories) return;
@@ -155,8 +159,8 @@ export function EditMealForm({
                 currentValues.isPrivate !== (existingMeal?.isPrivate || false) ||
                 currentValues.isToTry !== (existingMeal?.isToTry || false) ||
                 JSON.stringify(currentTagNames) !== JSON.stringify(originalTagNames) ||
-                recipeLink !== (existingMeal?.recipeLink ?? "") ||
-                videoLink !== (existingMeal?.videoLink ?? "") ||
+                currentValues.recipeLink !== (existingMeal?.recipeLink ?? "") ||
+                currentValues.videoLink !== (existingMeal?.videoLink ?? "") ||
                 hasImageChanges ||
                 hasImageOrderChanges
             );
@@ -187,8 +191,8 @@ export function EditMealForm({
                 isToTry: values.isToTry,
                 categoryId: tagsAndCategories?.categories.find(category => category.name === values.categoryName)?.id,
                 tagIds: tagsAndCategories?.tags.filter((tag) => values.tagNames.includes(tag.name)).map((tag) => tag.id),
-                recipeLink,
-                videoLink,
+                recipeLink: values.recipeLink,
+                videoLink: values.videoLink,
             }
 
             const mealId = existingMeal?.id ?? crypto.randomUUID();
@@ -210,15 +214,25 @@ export function EditMealForm({
         }
     };
 
+    const recipeLink = form.useWatchValue("recipeLink");
+    const videoLink = form.useWatchValue("videoLink");
+
     return (
         <form id="edit-meal-form" onSubmit={form.onSubmit(handleSubmit)} className={classes.editMealForm}>
-            <TextInput
-                radius="sm"
-                placeholder={t("Title")}
-                withAsterisk
-                key={form.key("title")}
-                {...form.getInputProps("title")}
-            />
+            <Box>
+                <TextInput
+                    radius="sm"
+                    placeholder={t("Title")}
+                    withAsterisk
+                    key={form.key("title")}
+                    {...form.getInputProps("title")}
+                />
+                <Switch
+                    label={t("Private")}
+                    key={form.key("isPrivate")}
+                    {...form.getInputProps("isPrivate", {type: "checkbox"})}
+                />
+            </Box>
 
             <CustomAutocompleteWithCreate
                 placeholder={t("Choose Category")}
@@ -228,17 +242,22 @@ export function EditMealForm({
                 {...form.getInputProps("categoryName")}
             />
 
-            <Switch
-                label={t("Private")}
-                key={form.key("isPrivate")}
-                {...form.getInputProps("isPrivate", {type: "checkbox"})}
-            />
+            <Box>
+                <PasteLinkButton
+                    value={recipeLink}
+                    onChange={(val) => form.setFieldValue("recipeLink", val)}
+                />
+                <PasteLinkButton
+                    value={videoLink}
+                    onChange={(val) => form.setFieldValue("videoLink", val)}
+                />
 
-            <Switch
-                label={t("To Try")}
-                key={form.key("isToTry")}
-                {...form.getInputProps("isToTry", {type: "checkbox"})}
-            />
+                <Switch
+                    label={t("To Try")}
+                    key={form.key("isToTry")}
+                    {...form.getInputProps("isToTry", {type: "checkbox"})}
+                />
+            </Box>
 
             <Textarea
                 placeholder={t("Here you can type anything your heart desires")}
