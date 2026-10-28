@@ -1,7 +1,7 @@
 import {MantineProvider} from '@mantine/core';
 import {StrictMode} from 'react'
 import {createRoot} from 'react-dom/client'
-import './index-dummy.css'
+import './index.css'
 import {RouterProvider} from "react-router/dom";
 import {registerSW} from 'virtual:pwa-register';
 import {AuthProvider} from "./contexts/AuthContext.tsx";
