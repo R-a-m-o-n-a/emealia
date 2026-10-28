@@ -1,5 +1,5 @@
 import {useAuth} from "../../../contexts/AuthContext.tsx";
-import {useMeals} from "../../../utils/data/helpers/useMeals.ts";
+import {useMealsWithCategoriesAndTags} from "../../../utils/data/helpers/useMealsWithCategoriesAndTags.ts";
 import {t} from "../../../utils/translate.ts";
 import {CategorySectionHeader} from "./CategorySectionHeader.tsx";
 import {MealListItem} from "./MealListItem.tsx";
@@ -10,7 +10,7 @@ const UNCATEGORIZED_KEY = '__uncategorized__';
 
 export function MealsList() {
     const {userId} = useAuth();
-    const result = useMeals(userId);
+    const result = useMealsWithCategoriesAndTags(userId);
 
     if (!result) {
         return <div className={classes.mealsList}>Loading...</div>;
